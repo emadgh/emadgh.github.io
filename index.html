@@ -43,6 +43,13 @@
   </script>
 
   <link rel="stylesheet" href="dist/grid-gallery.min.css" />
+  <style>
+    /* Brand logos: use contain so they aren't cropped by grid-gallery's default cover */
+    #mygallery2 img {
+      object-fit: contain !important;
+      background:none;
+    }
+  </style>
 </head>
 
 <body
@@ -113,6 +120,30 @@
 
 <!--        </div>-->
 <!--      </div>-->
+    </section>
+
+    <h1 class="text-4xl pt-10 pb-8 font-bold">BRANDS</h1>
+    <p>Groups I've worked for and made catalogues</p>
+    <section>
+        <div class="container w-full">
+            <div class="flex flex-wrap w-full">
+            <div class="gg-container">
+                <div class="gg-box" id="mygallery2" style="--gap-length: 10px;--layout: horizontal">
+                <a href="#" data-fancybox="gallery" title="1">
+                    <img src="dist/brands/Chersaie.webp" alt="1" />
+                </a><a href="#" data-fancybox="gallery" title="1">
+                    <img src="dist/brands/kavian.webp" alt="1" />
+                </a><a href="#" data-fancybox="gallery" title="1">
+                    <img src="dist/brands/khaneh-man.webp" alt="1" />
+                </a><a href="#" data-fancybox="gallery" title="1">
+                    <img src="dist/brands/Zohreh-ceram.webp" alt="1" />
+                </a><a href="#" data-fancybox="gallery" title="1">
+                    <img src="dist/brands/zohreh.webp" alt="1" />
+                </a>
+                </div>
+            </div>
+            </div>
+        </div>
     </section>
   </div>
   <!-- Footer -->
