@@ -1,0 +1,8 @@
+{
+  "date": "2026-07-20",
+  "framework": "static HTML with Tailwind-generated legacy CSS",
+  "fonts": ["Signika", "Nothing You Could Do"],
+  "motion": "small shared JavaScript helpers; no motion library",
+  "spacing": "no existing token scale",
+  "preserved": ["portfolio imagery", "brand imagery", "About portrait", "Fancybox lightbox"]
+}
