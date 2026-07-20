@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎮 Game Hub</title>
+  <style>
+    :root {
+      --bg: #0f0e17;
+      --card: #1a1932;
+      --card-hover: #232148;
+      --accent: #ff8906;
+      --accent2: #e53170;
+      --accent3: #7f5af0;
+      --text: #fffffe;
+      --muted: #94a1b2;
+      --glow: rgba(255, 137, 6, 0.15);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── Animated background ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 10% 20%, #7f5af015 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 90% 80%, #e5317015 0%, transparent 60%),
+        radial-gradient(ellipse 70% 60% at 50% 50%, #ff890608 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Floating particles ─── */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 12s infinite ease-in-out;
+    }
+    .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { left: 25%; top: 60%; animation-delay: 2s; width: 3px; height: 3px; background: var(--accent2); }
+    .particle:nth-child(3) { left: 40%; top: 10%; animation-delay: 4s; width: 5px; height: 5px; background: var(--accent3); }
+    .particle:nth-child(4) { left: 55%; top: 70%; animation-delay: 1s; }
+    .particle:nth-child(5) { left: 70%; top: 30%; animation-delay: 3s; width: 3px; height: 3px; background: var(--accent2); }
+    .particle:nth-child(6) { left: 85%; top: 80%; animation-delay: 5s; background: var(--accent3); }
+    .particle:nth-child(7) { left: 50%; top: 90%; animation-delay: 6s; width: 3px; height: 3px; }
+    .particle:nth-child(8) { left: 5%; top: 50%; animation-delay: 7s; background: var(--accent2); }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
+      50% { transform: translateY(-30px) scale(1.5); opacity: 0.6; }
+    }
+
+    /* ─── Layout ─── */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 20px 40px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Header ─── */
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .logo {
+      font-size: clamp(48px, 10vw, 80px);
+      line-height: 1;
+      margin-bottom: 8px;
+      animation: pulse-glow 3s infinite ease-in-out;
+      display: block;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { filter: drop-shadow(0 0 8px var(--glow)); }
+      50% { filter: drop-shadow(0 0 25px var(--glow)); }
+    }
+    h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: clamp(14px, 2vw, 18px);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ─── Game grid ─── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      flex: 1;
+    }
+
+    /* ─── Game card ─── */
+    .game-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 28px 24px 24px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      background: var(--card-hover);
+      border-color: rgba(255,255,255,0.12);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+    .game-card:hover::before {
+      opacity: 1;
+    }
+
+    .game-emoji {
+      font-size: 40px;
+      margin-bottom: 14px;
+      display: block;
+      line-height: 1;
+    }
+    .game-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .game-title-fa {
+      direction: rtl;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .game-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+    .game-tag {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 4px 12px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      align-self: flex-start;
+    }
+    .tag-racing { background: var(--accent); color: #0f0e17; }
+    .tag-action { background: var(--accent2); color: #fff; }
+    .tag-puzzle { background: var(--accent3); color: #fff; }
+    .tag-survival { background: #2cb67d; color: #0f0e17; }
+
+    /* ─── Footer ─── */
+    footer {
+      text-align: center;
+      padding: 30px 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 600px) {
+      .container { padding: 30px 16px 20px; }
+      .game-grid { grid-template-columns: 1fr; }
+      .game-card { padding: 20px 18px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <span class="logo">🎮</span>
+      <h1>Game Hub</h1>
+      <p class="subtitle">a little corner for little distractions</p>
+    </header>
+
+    <div class="game-grid">
+
+      <!-- ─── Midnight Rider ─── -->
+      <a class="game-card" href="midnight-rider.html" target="_blank">
+        <span class="game-emoji">🏎️</span>
+        <div class="game-title">Midnight Rider</div>
+        <div class="game-title-fa">جاده بی‌انتها</div>
+        <div class="game-desc">
+          A dark endless driving game — race through the night, dodge traffic, and see how far you can go.
+        </div>
+        <span class="game-tag tag-racing">🏁 Racing</span>
+      </a>
+
+      <!-- ─── Tank Arena ─── -->
+      <a class="game-card" href="Tank Arena.html" target="_blank">
+        <span class="game-emoji">🪖</span>
+        <div class="game-title">Tank Arena</div>
+        <div class="game-title-fa">نبرد تانک‌ها</div>
+        <div class="game-desc">
+          Battle the CPU in a tank duel. Pick up weapons and power-ups, aim carefully, and blow stuff up.
+        </div>
+        <span class="game-tag tag-action">💥 Action</span>
+      </a>
+
+      <!-- ─── Guess the Flag ─── -->
+      <a class="game-card" href="flags/" target="_blank">
+        <span class="game-emoji">🇺🇳</span>
+        <div class="game-title">Guess the Flag</div>
+        <div class="game-title-fa">پرچم را حدس بزن</div>
+        <div class="game-desc">
+          How well do you know the world? Identify flags from every country — a quiz that travels the globe.
+        </div>
+        <span class="game-tag tag-puzzle">🧩 Puzzle</span>
+      </a>
+
+      <!-- ─── Inferno Survivor ─── -->
+      <a class="game-card" href="vampire/" target="_blank">
+        <span class="game-emoji">🧛</span>
+        <div class="game-title">Inferno Survivor</div>
+        <div class="game-title-fa"></div>
+        <div class="game-desc">
+          Survive the onslaught. Move, dodge, and fight waves of enemies in a fiery arena. How long can you last?
+        </div>
+        <span class="game-tag tag-survival">🔥 Survival</span>
+      </a>
+
+    </div>
+
+    <footer>
+      <p><a href="../index.html">← back to portfolio</a></p>
+    </footer>
+  </div>
+
+</body>
+</html>
