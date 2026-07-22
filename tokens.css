@@ -13,6 +13,9 @@
   --color-focus: oklch(77% 0.13 235);
   --color-success: oklch(72% 0.11 150);
   --color-error: oklch(70% 0.16 28);
+  --color-aura-clay: oklch(64% 0.125 52 / 0.22);
+  --color-aura-amber: oklch(74% 0.13 72 / 0.16);
+  --color-aura-clear: oklch(16% 0.014 58 / 0);
 
   --font-display: "Signika", sans-serif;
   --font-body: "IBM Plex Sans", sans-serif;
@@ -52,4 +55,5 @@
   --radius-card: 0.375rem;
   --radius-button: 0.125rem;
   --shell: 90rem;
+  --gallery-row: 10rem;
 }
