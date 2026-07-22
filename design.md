@@ -4,7 +4,7 @@ A locked design system for the portfolio and About pages.
 
 ## Genre
 
-Editorial atelier: material-led, restrained, and image-first.
+Editorial atelier with an atmospheric layer: material-led, restrained, and image-first.
 
 ## Macrostructure family
 
@@ -23,7 +23,7 @@ Dark ceramic paper, warm off-white ink, and a sparse terracotta accent. The exac
 
 ## Motion
 
-Quiet image lift and colour shifts only. Reduced motion collapses to a short opacity crossfade.
+GSAP and ScrollTrigger coordinate three motion primitives: staged content reveals, sequenced media reveals and a two-layer warm aura scrub. Motion changes transform and opacity only, uses restrained `power2.out` easing and runs once for content; reduced motion keeps the full experience static and readable.
 
 ## CTA voice
 
@@ -31,7 +31,7 @@ Rectangular terracotta action with a one-pixel rule and direct, single-line copy
 
 ## What pages must share
 
-Masthead, warm-paper palette, font pairing, terracotta accent restraint, rules, footer treatment, and 4-point spacing scale.
+Masthead, dark ceramic palette, font pairing, terracotta accent restraint, rules, footer treatment, and 4-point spacing scale.
 
 ## Exports
 

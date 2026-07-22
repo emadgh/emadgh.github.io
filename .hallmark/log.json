@@ -1,5 +1,21 @@
 [
   {
+    "date": "2026-07-22",
+    "scope": "app",
+    "macrostructure": "Photographic Archive with justified rows",
+    "theme": "custom ceramic atelier with atmospheric aura",
+    "enrichment": "GSAP ScrollTrigger motion system",
+    "brief": "Add restrained scroll reveals, sequenced gallery motion, and a GSAP-driven aura across the portfolio and About pages."
+  },
+  {
+    "date": "2026-07-22",
+    "scope": "portfolio-page",
+    "macrostructure": "Photographic Archive with justified rows",
+    "theme": "custom ceramic atelier with atmospheric aura",
+    "enrichment": "Tier A CSS aura",
+    "brief": "Add scroll-reactive aura, staged gallery loading, aligned rows, and move the name into the hero."
+  },
+  {
     "date": "2026-07-20",
     "scope": "app",
     "macrostructure": "Photographic Archive + Letter",

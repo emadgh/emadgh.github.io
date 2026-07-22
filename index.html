@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Portfolio of Emad Ghasemi, ceramic and 3D designer.">
   <title>Emad Ghasemi — Ceramic &amp; 3D Designer</title>
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('motion-pending');
+      window.setTimeout(() => {
+        if (!document.documentElement.classList.contains('motion-ready')) document.documentElement.classList.remove('motion-pending');
+      }, 4000);
+    }
+  </script>
   <link rel="icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,16 +74,17 @@
     const toggle = document.querySelector('.menu-toggle');
     toggle.addEventListener('click', () => { const open = header.dataset.open === 'true'; header.dataset.open = String(!open); toggle.setAttribute('aria-expanded', String(!open)); toggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation'); });
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    document.documentElement.classList.remove('motion-pending');
+    if (hasGsap && !reduceMotion.matches) document.documentElement.classList.add('motion-ready');
 
     function revealOnScroll(targets, options = {}) {
       if (reduceMotion.matches || !hasGsap) return;
       gsap.utils.toArray(targets).forEach((target) => {
-        gsap.from(target, {
-          autoAlpha: 0,
-          y: options.y ?? 28,
+        gsap.to(target, {
+          autoAlpha: 1,
+          y: 0,
           duration: options.duration ?? 0.72,
           ease: 'power2.out',
-          clearProps: 'transform,opacity,visibility',
           scrollTrigger: { trigger: target, start: 'top 88%', once: true }
         });
       });
@@ -86,14 +95,13 @@
       ScrollTrigger.batch(items, {
         start: 'top 90%',
         once: true,
-        onEnter: (batch) => gsap.from(batch, {
-          autoAlpha: 0,
-          y: 22,
-          scale: 0.985,
+        onEnter: (batch) => gsap.to(batch, {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
           duration: 0.64,
           stagger: 0.055,
-          ease: 'power2.out',
-          clearProps: 'transform,opacity,visibility'
+          ease: 'power2.out'
         })
       });
       ScrollTrigger.refresh();
@@ -102,35 +110,32 @@
     function initPageMotion() {
       if (reduceMotion.matches || !hasGsap) return;
 
-      gsap.from(['.masthead__issue', '.masthead__main', '.masthead__nav'], {
-        autoAlpha: 0,
-        y: 14,
+      gsap.to(['.masthead__issue', '.masthead__main', '.masthead__nav'], {
+        autoAlpha: 1,
+        y: 0,
         duration: 0.58,
         stagger: 0.07,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity,visibility'
+        ease: 'power2.out'
       });
-      gsap.from(['.hero__name', '.hero__meta', '.hero__title', '.hero__lede', '.hero__action'], {
-        autoAlpha: 0,
-        y: 26,
+      gsap.to(['.hero__name', '.hero__meta', '.hero__title', '.hero__lede', '.hero__action'], {
+        autoAlpha: 1,
+        y: 0,
         duration: 0.76,
         delay: 0.12,
         stagger: 0.075,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity,visibility'
+        ease: 'power2.out'
       });
 
       revealOnScroll('.section-head, .archive-caption, .archive-actions, .footer__close, .footer__grid, .footer__meta');
       ScrollTrigger.batch('.brand', {
         start: 'top 88%',
         once: true,
-        onEnter: (batch) => gsap.from(batch, {
-          autoAlpha: 0,
-          y: 20,
+        onEnter: (batch) => gsap.to(batch, {
+          autoAlpha: 1,
+          y: 0,
           duration: 0.62,
           stagger: 0.08,
-          ease: 'power2.out',
-          clearProps: 'transform,opacity,visibility'
+          ease: 'power2.out'
         })
       });
 

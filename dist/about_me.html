@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="About Emad Ghasemi, ceramic and 3D designer.">
   <title>About Emad Ghasemi</title>
+  <script>
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('motion-pending');
+      window.setTimeout(() => {
+        if (!document.documentElement.classList.contains('motion-ready')) document.documentElement.classList.remove('motion-pending');
+      }, 4000);
+    }
+  </script>
   <link rel="icon" href="assets/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,50 +44,49 @@
   <script>
     const hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
     if (hasGsap) gsap.registerPlugin(ScrollTrigger);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    document.documentElement.classList.remove('motion-pending');
+    if (hasGsap && !reduceMotion.matches) document.documentElement.classList.add('motion-ready');
 
     const header = document.querySelector('.masthead');
     const toggle = document.querySelector('.menu-toggle');
     toggle.addEventListener('click', () => { const open = header.dataset.open === 'true'; header.dataset.open = String(!open); toggle.setAttribute('aria-expanded', String(!open)); toggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation'); });
 
-    if (hasGsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      gsap.from(['.masthead__issue', '.masthead__main', '.masthead__nav'], {
-        autoAlpha: 0,
-        y: 14,
+    if (hasGsap && !reduceMotion.matches) {
+      gsap.to(['.masthead__issue', '.masthead__main', '.masthead__nav'], {
+        autoAlpha: 1,
+        y: 0,
         duration: 0.58,
         stagger: 0.07,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity,visibility'
+        ease: 'power2.out'
       });
 
-      gsap.from('.profile__portrait', {
-        autoAlpha: 0,
-        y: 28,
-        scale: 0.985,
+      gsap.to('.profile__portrait', {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
         duration: 0.8,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity,visibility'
+        ease: 'power2.out'
       });
-      gsap.from('.profile__copy > *', {
-        autoAlpha: 0,
-        y: 24,
+      gsap.to('.profile__copy > *', {
+        autoAlpha: 1,
+        y: 0,
         duration: 0.7,
         delay: 0.12,
         stagger: 0.075,
-        ease: 'power2.out',
-        clearProps: 'transform,opacity,visibility'
+        ease: 'power2.out'
       });
 
       ['.contact-strip__inner > *', '.footer__close', '.footer__grid', '.footer__meta'].forEach((selector) => {
         ScrollTrigger.batch(selector, {
           start: 'top 88%',
           once: true,
-          onEnter: (batch) => gsap.from(batch, {
-            autoAlpha: 0,
-            y: 26,
+          onEnter: (batch) => gsap.to(batch, {
+            autoAlpha: 1,
+            y: 0,
             duration: 0.7,
             stagger: 0.08,
-            ease: 'power2.out',
-            clearProps: 'transform,opacity,visibility'
+            ease: 'power2.out'
           })
         });
       });
