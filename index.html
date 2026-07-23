@@ -1,235 +1,34 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="description" content="Portfolio of Emad Ghasemi, ceramic and 3D designer.">
-  <title>Emad Ghasemi — Ceramic &amp; 3D Designer</title>
-  <script>
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.documentElement.classList.add('motion-pending');
-      window.setTimeout(() => {
-        if (!document.documentElement.classList.contains('motion-ready')) document.documentElement.classList.remove('motion-pending');
-      }, 4000);
-    }
-  </script>
-  <link rel="icon" href="favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;600&family=Signika:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css">
-  <link rel="stylesheet" href="dist/site.css">
-</head>
-<body>
-  <div class="aura" aria-hidden="true"><span class="aura__layer aura__layer--clay"></span><span class="aura__layer aura__layer--amber"></span></div>
-  <a class="skip-link" href="#work">Skip to portfolio</a>
-  <header class="masthead shell" data-open="false">
-    <div class="masthead__issue"><span>Ceramic / 3D / Iran</span><span>Selected works</span></div>
-    <div class="masthead__main">
-      <a class="masthead__home" href="index.html" aria-label="Home">Portfolio archive</a>
-      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"><span class="menu-toggle__line" aria-hidden="true"></span></button>
-    </div>
-    <nav class="masthead__nav" aria-label="Primary navigation"><ul><li><a href="index.html" aria-current="page">Portfolio</a></li><li><a href="dist/about_me.html">About me</a></li></ul></nav>
-  </header>
-
-  <main>
-    <section class="hero shell" aria-labelledby="portfolio-title">
-      <p class="hero__name">Emad Ghasemi</p>
-      <p class="meta hero__meta">A selection of ceramics, tiles and spatial studies</p>
-      <h1 class="hero__title" id="portfolio-title">Work made for <mark>spaces to live in.</mark></h1>
-      <p class="hero__lede">Emad Ghasemi is a ceramic and 3D designer creating tile collections and visual environments with a practical eye for material, scale and atmosphere.</p>
-      <a class="button hero__action" href="#work">View the archive</a>
-    </section>
-
-    <section class="section shell" id="work" aria-labelledby="work-title">
-      <div class="section-head"><p class="meta">Archive / 45 works</p><h2 class="section-head__title" id="work-title">Selected work</h2></div>
-      <div class="archive" id="gallery" aria-label="Selected portfolio images"></div>
-      <p class="archive-caption"><span>Tap an image to view it in full.</span><span>2015—present</span></p>
-      <div class="archive-actions"><p class="archive-status" id="gallery-status" aria-live="polite">Showing 0 of 45 works</p><button class="button button--outline" id="load-more" type="button">Load 15 more</button></div>
-    </section>
-
-    <section class="section section--brands" aria-labelledby="brands-title">
-      <div class="shell"><div class="section-head"><p class="meta">Collaboration</p><h2 class="section-head__title" id="brands-title">Brands and studios</h2><p class="section-head__copy">Groups I have worked with and made catalogues for.</p></div>
-        <div class="brands">
-          <div class="brand"><img src="dist/brands/arnikaceram.webp" alt="Arnika Ceram"></div>
-          <div class="brand"><img src="dist/brands/barsam.webp" alt="Barsam"></div>
-          <div class="brand"><img src="dist/brands/Chersaie.webp" alt="Chersaie"></div>
-          <div class="brand"><img src="dist/brands/eilya.webp" alt="Eilya"></div>
-          <div class="brand"><img src="dist/brands/gloria.webp" alt="Gloria"></div>
-          <div class="brand"><img src="dist/brands/impiana.webp" alt="Impiana"></div>
-          <div class="brand"><img src="dist/brands/kavian.webp" alt="Kavian"></div>
-          <div class="brand"><img src="dist/brands/khaneh-man.webp" alt="Khaneh Man"></div>
-          <div class="brand"><img src="dist/brands/mirage.webp" alt="Mirage"></div>
-          <div class="brand"><img src="dist/brands/rafel.webp" alt="Rafel"></div>
-          <div class="brand"><img src="dist/brands/zeus.webp" alt="Zeus"></div>
-          <div class="brand"><img src="dist/brands/Zohreh-ceram.webp" alt="Zohreh Ceram"></div>
-          <div class="brand"><img src="dist/brands/zohreh.webp" alt="Zohreh"></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer shell"><p class="footer__close">Built around material, light and the room beyond the tile.</p><div class="footer__grid"><div class="footer__identity">Emad Ghasemi</div><div class="footer__details">Iran — Khorasan — Kashmar<br><a href="tel:+989366828978">+98 936 682 8978</a></div><div class="footer__links"><a class="footer__link" href="https://www.instagram.com/emadghasemi" target="_blank" rel="noreferrer">Instagram</a><a class="footer__link" href="https://www.behance.net/emadghasemi" target="_blank" rel="noreferrer">Behance</a><a class="footer__link" href="dist/about_me.html">About me</a></div></div><p class="footer__meta">© 2026 Emad Ghasemi</p></footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
-  <script>
-    const hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
-    if (hasGsap) gsap.registerPlugin(ScrollTrigger);
-
-    const header = document.querySelector('.masthead');
-    const toggle = document.querySelector('.menu-toggle');
-    toggle.addEventListener('click', () => { const open = header.dataset.open === 'true'; header.dataset.open = String(!open); toggle.setAttribute('aria-expanded', String(!open)); toggle.setAttribute('aria-label', open ? 'Open navigation' : 'Close navigation'); });
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    document.documentElement.classList.remove('motion-pending');
-    if (hasGsap && !reduceMotion.matches) document.documentElement.classList.add('motion-ready');
-
-    function revealOnScroll(targets, options = {}) {
-      if (reduceMotion.matches || !hasGsap) return;
-      gsap.utils.toArray(targets).forEach((target) => {
-        gsap.to(target, {
-          autoAlpha: 1,
-          y: 0,
-          duration: options.duration ?? 0.72,
-          ease: 'power2.out',
-          scrollTrigger: { trigger: target, start: 'top 88%', once: true }
-        });
-      });
-    }
-
-    function animateGalleryItems(items) {
-      if (reduceMotion.matches || !hasGsap || !items.length) return;
-      ScrollTrigger.batch(items, {
-        start: 'top 90%',
-        once: true,
-        onEnter: (batch) => gsap.to(batch, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.64,
-          stagger: 0.055,
-          ease: 'power2.out'
-        })
-      });
-      ScrollTrigger.refresh();
-    }
-
-    function initPageMotion() {
-      if (reduceMotion.matches || !hasGsap) return;
-
-      gsap.to(['.masthead__issue', '.masthead__main', '.masthead__nav'], {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.58,
-        stagger: 0.07,
-        ease: 'power2.out'
-      });
-      gsap.to(['.hero__name', '.hero__meta', '.hero__title', '.hero__lede', '.hero__action'], {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.76,
-        delay: 0.12,
-        stagger: 0.075,
-        ease: 'power2.out'
-      });
-
-      revealOnScroll('.section-head, .archive-caption, .archive-actions, .footer__close, .footer__grid, .footer__meta');
-      ScrollTrigger.batch('.brand', {
-        start: 'top 88%',
-        once: true,
-        onEnter: (batch) => gsap.to(batch, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.62,
-          stagger: 0.08,
-          ease: 'power2.out'
-        })
-      });
-
-      gsap.timeline({
-        scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: 1 }
-      })
-        .to('.aura__layer--clay', { y: '6rem', scale: 1.08, autoAlpha: 0.16, ease: 'none' }, 0)
-        .to('.aura__layer--amber', { x: '5rem', y: '-7rem', scale: 1.03, autoAlpha: 0.3, ease: 'none' }, 0);
-    }
-
-    const gallery = document.querySelector('#gallery');
-    const loadMore = document.querySelector('#load-more');
-    const galleryStatus = document.querySelector('#gallery-status');
-    const works = [[394,512],[394,512],[398,512],[512,384],[512,512],[384,512],[398,512],[512,384],[512,384],[398,512],[384,512],[398,512],[398,512],[512,384],[512,384],[348,512],[512,384],[512,384],[512,512],[512,512],[398,512],[398,512],[512,384],[512,384],[512,512],[512,321],[512,384],[512,387],[359,512],[369,512],[512,384],[512,384],[512,384],[512,384],[512,384],[398,512],[398,512],[398,512],[397,512],[397,512],[397,512],[397,512],[512,384],[288,512],[397,512]];
-    const batchSize = 15;
-    let visibleWorks = 0;
-    let galleryRowPixels = 160;
-    let galleryFrame = 0;
-
-    function readGalleryRow() {
-      const rootStyle = getComputedStyle(document.documentElement);
-      galleryRowPixels = parseFloat(rootStyle.getPropertyValue('--gallery-row')) * parseFloat(rootStyle.fontSize);
-    }
-
-    function syncGalleryRows() {
-      readGalleryRow();
-      gallery.querySelectorAll('.archive__item').forEach((item) => {
-        item.style.setProperty('--basis', `${galleryRowPixels * Number(item.dataset.ratio)}px`);
-      });
-      galleryFrame = 0;
-    }
-
-    function requestGallerySync() { if (!galleryFrame) galleryFrame = requestAnimationFrame(syncGalleryRows); }
-    readGalleryRow();
-    window.addEventListener('resize', requestGallerySync, { passive: true });
-
-    function makeWork(index) {
-      const number = index + 1;
-      const [width, height] = works[index];
-      const name = `3d-emadghasemi-(${number})`;
-      const link = document.createElement('a');
-      const image = document.createElement('img');
-      link.className = 'archive__item';
-      link.href = `dist/images/${name}.jpg`;
-      link.dataset.fancybox = 'portfolio';
-      const ratio = width / height;
-      link.dataset.ratio = String(ratio);
-      link.style.setProperty('--ratio', String(ratio));
-      link.style.setProperty('--basis', `${galleryRowPixels * ratio}px`);
-      link.setAttribute('aria-label', `Open portfolio image ${number}`);
-      image.src = `dist/images/512/${name}.jpg`;
-      image.alt = `Portfolio work ${number}`;
-      image.width = width;
-      image.height = height;
-      image.loading = number <= 4 ? 'eager' : 'lazy';
-      link.append(image);
-      return link;
-    }
-
-    function loadNextBatch() {
-      loadMore.disabled = true;
-      loadMore.classList.add('is-loading');
-      loadMore.setAttribute('aria-busy', 'true');
-      const nextVisible = Math.min(visibleWorks + batchSize, works.length);
-      const fragment = document.createDocumentFragment();
-      const newItems = [];
-      for (let index = visibleWorks; index < nextVisible; index += 1) {
-        const item = makeWork(index);
-        newItems.push(item);
-        fragment.append(item);
-      }
-      gallery.append(fragment);
-      visibleWorks = nextVisible;
-      galleryStatus.textContent = `Showing ${visibleWorks} of ${works.length} works`;
-      loadMore.classList.remove('is-loading');
-      loadMore.removeAttribute('aria-busy');
-      loadMore.disabled = false;
-      loadMore.hidden = visibleWorks >= works.length;
-      if (!loadMore.hidden) loadMore.textContent = `Load ${Math.min(batchSize, works.length - visibleWorks)} more`;
-      animateGalleryItems(newItems);
-    }
-
-    loadMore.addEventListener('click', loadNextBatch);
-    initPageMotion();
-    loadNextBatch();
-    Fancybox.bind('[data-fancybox="portfolio"]', {});
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#090909" />
+    <meta
+      name="description"
+      content="Portfolio of Emad Ghasemi, ceramic and 3D designer creating material-led surfaces and spatial visualizations."
+    />
+    <script>
+      (() => {
+        const root = document.documentElement;
+        root.classList.add('js-enabled');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          root.classList.add('reduce-motion');
+        }
+      })();
+    </script>
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <title>Emad Ghasemi — Ceramic &amp; 3D Designer</title>
+    <script type="module" crossorigin src="/assets/index-Dn5OiVDt.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-Dy9_JDK-.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
