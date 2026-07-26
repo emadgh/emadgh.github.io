@@ -1,0 +1,204 @@
+/* ============================================================
+   RTL (Right-to-Left) Styles — MDShare / Digital PM Document
+   ============================================================ */
+
+/* --- Base RTL direction --- */
+html[dir="rtl"],
+body.rtl,
+.rtl {
+  direction: rtl;
+  text-align: right;
+}
+
+/* --- Typography: Persian-optimized font stack --- */
+.rtl body,
+.rtl p,
+.rtl h1, .rtl h2, .rtl h3, .rtl h4, .rtl h5, .rtl h6,
+.rtl article,
+.rtl .prose {
+  font-family: "Vazirmatn", "Vazir", "IRANSans", "Tahoma", "Segoe UI", sans-serif;
+  line-height: 1.8;
+  word-spacing: 0.04em;
+}
+
+.rtl h1, .rtl h2, .rtl h3, .rtl h4, .rtl h5, .rtl h6 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.rtl h1 { font-size: 1.75rem; }
+.rtl h2 { font-size: 1.4rem; }
+.rtl h3 { font-size: 1.15rem; }
+
+/* --- Prose / article content --- */
+.rtl .prose {
+  max-width: 100%;
+}
+
+.rtl .prose p {
+  margin-bottom: 1.2em;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.rtl .prose strong {
+  font-weight: 700;
+}
+
+/* --- Lists --- */
+.rtl ul, .rtl ol {
+  padding-right: 1.5em;
+  padding-left: 0;
+}
+
+.rtl li {
+  margin-bottom: 0.5em;
+}
+
+/* --- Tables --- */
+.rtl table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.9rem;
+}
+
+.rtl th,
+.rtl td {
+  padding: 0.6em 0.8em;
+  border: 1px solid #d1d5db;
+  text-align: right;
+  vertical-align: top;
+}
+
+.rtl th {
+  background-color: #f3f4f6;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rtl tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.rtl tbody tr:hover {
+  background-color: #e5e7eb;
+}
+
+/* --- Code blocks --- */
+.rtl code,
+.rtl pre {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+}
+
+.rtl pre {
+  padding: 1em;
+  overflow-x: auto;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #e2e8f0;
+}
+
+/* --- Inline code --- */
+.rtl :not(pre) > code {
+  direction: ltr;
+  unicode-bidi: embed;
+  background: #f1f5f9;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+/* --- Blockquotes --- */
+.rtl blockquote {
+  border-right: 4px solid #3b82f6;
+  border-left: none;
+  padding: 0.5em 1em 0.5em 0;
+  margin: 1em 0;
+  color: #475569;
+  font-style: normal;
+}
+
+/* --- Horizontal rules --- */
+.rtl hr {
+  margin: 2em 0;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* --- Header toolbar (filename + buttons) --- */
+.rtl .flex.items-center.justify-between {
+  flex-direction: row;
+}
+
+.rtl .flex.items-center.justify-between h1 {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* --- Tabs --- */
+.rtl [role="tablist"] {
+  flex-direction: row;
+}
+
+.rtl [role="tab"] {
+  text-align: center;
+}
+
+/* --- Alert banner --- */
+.rtl .bg-blue-500\/10,
+.rtl .border-blue-500\/20 {
+  text-align: right;
+}
+
+/* --- Button groups --- */
+.rtl .flex.items-center.gap-2 {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+/* --- Container adjustments --- */
+.rtl .container {
+  text-align: right;
+}
+
+/* --- Responsive: small screens --- */
+@media (max-width: 640px) {
+  .rtl table {
+    font-size: 0.8rem;
+  }
+
+  .rtl th,
+  .rtl td {
+    padding: 0.4em 0.5em;
+  }
+
+  .rtl h1 { font-size: 1.4rem; }
+  .rtl h2 { font-size: 1.2rem; }
+  .rtl h3 { font-size: 1rem; }
+
+  .rtl .flex.gap-6.flex-col {
+    gap: 1rem;
+  }
+}
+
+/* --- Print styles --- */
+@media print {
+  .rtl body {
+    font-size: 11pt;
+  }
+
+  .rtl table {
+    page-break-inside: auto;
+  }
+
+  .rtl tr {
+    page-break-inside: avoid;
+  }
+
+  .rtl h1, .rtl h2, .rtl h3 {
+    page-break-after: avoid;
+  }
+}
