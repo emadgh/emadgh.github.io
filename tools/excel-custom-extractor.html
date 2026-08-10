@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>استخراج‌گر سفارشی گزارش‌های اکسل</title>
+  <script src="../assets/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #f3f5f8;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #172033;
+      --muted: #64748b;
+      --border: #dbe2ea;
+      --primary: #2256d9;
+      --primary-strong: #1944b4;
+      --danger: #c62828;
+      --success: #087f5b;
+      --warning: #a15c00;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.07);
+      --radius: 15px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Tahoma, Arial, sans-serif;
+      line-height: 1.75;
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+    .app-shell {
+      width: min(1480px, calc(100% - 28px));
+      margin: 18px auto 60px;
+    }
+
+    .hero {
+      padding: 22px 24px;
+      border-radius: 20px;
+      color: #fff;
+      background: linear-gradient(135deg, #153a9f, #2a67ea);
+      box-shadow: var(--shadow);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+    }
+
+    .hero p { margin: 0; opacity: 0.9; max-width: 860px; }
+
+    .privacy-badge {
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 7px 12px;
+      white-space: nowrap;
+      font-size: .9rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
+    }
+
+    .main-column, .side-column { min-width: 0; }
+    .side-column { position: sticky; top: 12px; }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h2, .panel-header h3 { margin: 0; font-size: 1.05rem; }
+    .panel-body { padding: 18px; }
+
+    .muted { color: var(--muted); font-size: .9rem; }
+
+    .drop-zone {
+      border: 2px dashed #aebbd0;
+      border-radius: 14px;
+      background: var(--surface-2);
+      padding: 30px 18px;
+      text-align: center;
+      transition: .18s ease;
+    }
+
+    .drop-zone.dragover {
+      border-color: var(--primary);
+      background: #eef4ff;
+      transform: translateY(-1px);
+    }
+
+    .drop-zone strong { display: block; margin-bottom: 7px; font-size: 1.05rem; }
+
+    .button-row {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 14px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 700;
+      transition: .15s ease;
+    }
+
+    .btn:hover:not(:disabled) { border-color: #9fb0c7; transform: translateY(-1px); }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--primary-strong); border-color: var(--primary-strong); }
+    .btn-danger { color: var(--danger); }
+    .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+    .btn-small { padding: 6px 10px; font-size: .84rem; }
+    .btn-block { width: 100%; justify-content: center; display: inline-flex; }
+
+    input[type="file"] { display: none; }
+
+    .file-list { display: grid; gap: 8px; margin-top: 14px; }
+    .file-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px 12px;
+      background: #fff;
+    }
+    .file-item-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+    .file-item-meta { color: var(--muted); font-size: .82rem; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .stat {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px;
+    }
+    .stat-value { display: block; font-size: 1.18rem; font-weight: 800; }
+    .stat-label { display: block; color: var(--muted); font-size: .82rem; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+
+    label.field { display: block; min-width: 0; }
+    .field-title { display: block; font-size: .86rem; font-weight: 800; margin-bottom: 5px; }
+    .field-help { display: block; color: var(--muted); font-size: .78rem; margin-top: 4px; }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      border: 1px solid #cdd6e1;
+      border-radius: 9px;
+      padding: 9px 10px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(34, 86, 217, .11);
+    }
+    textarea { min-height: 92px; resize: vertical; direction: ltr; text-align: left; line-height: 1.55; }
+    textarea.rtl-input { direction: rtl; text-align: right; }
+
+    .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px 14px;
+      padding-top: 4px;
+    }
+    .check {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      color: #334155;
+      font-size: .87rem;
+    }
+
+    .rules-list { display: grid; gap: 13px; }
+    .rule-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .rule-card.is-disabled { opacity: .65; }
+    .rule-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 11px 13px;
+      background: var(--surface-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .rule-title-wrap { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .rule-number {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: grid; place-items: center;
+      background: #e7edfb; color: #1944b4; font-weight: 800;
+      flex: 0 0 auto;
+    }
+    .rule-summary { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
+    .rule-body { padding: 14px; }
+
+    .type-panel { display: none; }
+    .type-panel.active { display: block; }
+
+    .notice {
+      border-radius: 11px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: .87rem;
+      border: 1px solid;
+    }
+    .notice-info { background: #eef5ff; border-color: #c7dcff; color: #184790; }
+    .notice-warning { background: #fff8e8; border-color: #f2d99f; color: #7a4900; }
+    .notice-success { background: #edf9f4; border-color: #b8e5d3; color: #086649; }
+    .notice-danger { background: #fff0f0; border-color: #f0c4c4; color: #a11a1a; }
+
+    .progress-wrap { display: none; margin-top: 12px; }
+    .progress-wrap.visible { display: block; }
+    .progress-track { height: 10px; background: #e8edf3; border-radius: 999px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width .18s ease; }
+    .progress-text { margin-top: 6px; color: var(--muted); font-size: .84rem; }
+
+    .log {
+      max-height: 220px;
+      overflow: auto;
+      direction: ltr;
+      text-align: left;
+      background: #101827;
+      color: #dbeafe;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: Consolas, monospace;
+      font-size: .78rem;
+      white-space: pre-wrap;
+    }
+
+    .preview-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 9px;
+      padding: 7px 11px;
+      font-weight: 700;
+    }
+    .tab-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    .table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 10px; max-height: 520px; }
+    table { width: max-content; min-width: 100%; border-collapse: collapse; font-size: .84rem; }
+    th, td { border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); padding: 7px 9px; white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+    th { position: sticky; top: 0; background: #eef2f7; z-index: 1; }
+    tr:nth-child(even) td { background: #fafbfd; }
+
+    .empty-state { text-align: center; padding: 28px 15px; color: var(--muted); }
+    .separator { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+    .hidden { display: none !important; }
+
+    .sticky-actions {
+      display: grid;
+      gap: 9px;
+    }
+
+    .footer-note { color: var(--muted); text-align: center; font-size: .82rem; margin-top: 18px; }
+
+    @media (max-width: 1000px) {
+      .layout { grid-template-columns: 1fr; }
+      .side-column { position: static; }
+    }
+    @media (max-width: 720px) {
+      .app-shell { width: min(100% - 16px, 1480px); margin-top: 8px; }
+      .hero { border-radius: 14px; padding: 18px; }
+      .panel-body, .panel-header { padding: 13px; }
+      .col-8, .col-6, .col-4, .col-3 { grid-column: span 12; }
+      .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .rule-top { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <h1>استخراج‌گر سفارشی گزارش‌های اکسل</h1>
+        <p>چند فایل و صدها شیت را بر اساس محدوده‌ها یا آدرس‌های سلولی ثابت پردازش کنید و خروجی تفکیک‌شده برای واحدهایی مانند پرس، برق، کوره، سورتر و بسته‌بندی بسازید.</p>
+      </div>
+      <div class="privacy-badge">پردازش کاملاً داخل مرورگر</div>
+    </section>
+
+    <div class="layout">
+      <div class="main-column">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>۱. فایل‌های ورودی</h2>
+              <div class="muted">فایل‌ها به سرور ارسال نمی‌شوند.</div>
+            </div>
+            <button class="btn btn-danger btn-small" id="clearFilesBtn" type="button">حذف همه فایل‌ها</button>
+          </div>
+          <div class="panel-body">
+            <div class="drop-zone" id="dropZone">
+              <strong>فایل‌های اکسل را اینجا رها کنید</strong>
+              <div class="muted">فرمت‌های XLSX، XLS، XLSM، XLSB، ODS و CSV پشتیبانی می‌شوند.</div>
+              <div class="button-row" style="justify-content:center; margin-top:13px">
+                <label class="btn btn-primary" for="fileInput">انتخاب چند فایل</label>
+                <input id="fileInput" type="file" multiple accept=".xlsx,.xls,.xlsm,.xlsb,.ods,.csv" />
+              </div>
+            </div>
+            <div class="file-list" id="fileList"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>۲. قواعد استخراج</h2>
+              <div class="muted">هر قاعده داده‌های همه فایل‌ها و شیت‌های منطبق را به شیت خروجی مشخص‌شده اضافه می‌کند.</div>
+            </div>
+            <div class="button-row">
+              <button class="btn btn-small" id="addExampleBtn" type="button">افزودن نمونه</button>
+              <button class="btn btn-primary btn-small" id="addRuleBtn" type="button">قاعده جدید</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="notice notice-info">
+              <b>محدوده جدولی:</b> برای هر شیت، سطرهای یک یا چند محدوده مانند <code>A10:H25</code> استخراج می‌شوند.<br />
+              <b>سلول‌های پراکنده:</b> از هر شیت یک رکورد ساخته می‌شود؛ مانند <code>تاریخ = B2</code> و <code>مقدار تولید = F18</code>.
+            </div>
+            <div class="rules-list" id="rulesList"></div>
+            <div class="empty-state hidden" id="rulesEmpty">هنوز قاعده‌ای تعریف نشده است.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>۳. پیش‌نمایش خروجی</h2>
+              <div class="muted">حداکثر ۵۰ ردیف از هر شیت خروجی نمایش داده می‌شود.</div>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div id="previewEmpty" class="empty-state">پس از اجرای استخراج، پیش‌نمایش در این بخش نمایش داده می‌شود.</div>
+            <div id="previewArea" class="hidden">
+              <div class="preview-tabs" id="previewTabs"></div>
+              <div class="table-wrap"><table id="previewTable"></table></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><h3>گزارش پردازش</h3></div>
+          <div class="panel-body">
+            <div class="log" id="logBox">آماده.</div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="panel">
+          <div class="panel-header"><h3>تنظیمات عمومی</h3></div>
+          <div class="panel-body">
+            <div class="form-grid">
+              <label class="field col-12">
+                <span class="field-title">نام فایل خروجی</span>
+                <input id="outputFileName" type="text" value="خروجی-استخراج.xlsx" />
+              </label>
+
+              <label class="field col-12">
+                <span class="field-title">نحوه خواندن مقدار سلول</span>
+                <select id="valueMode">
+                  <option value="raw">مقدار واقعی؛ مناسب عدد و تاریخ</option>
+                  <option value="formatted">متن نمایش‌داده‌شده در اکسل</option>
+                </select>
+              </label>
+
+              <div class="col-12 checks">
+                <label class="check"><input id="includeHiddenSheets" type="checkbox" /> پردازش شیت‌های مخفی</label>
+                <label class="check"><input id="fillMergedCells" type="checkbox" checked /> تکمیل سلول‌های ادغام‌شده</label>
+                <label class="check"><input id="skipEmptyRows" type="checkbox" checked /> حذف ردیف‌های کاملاً خالی</label>
+                <label class="check"><input id="autoWidth" type="checkbox" checked /> عرض خودکار ستون‌ها</label>
+                <label class="check"><input id="autoFilter" type="checkbox" checked /> فعال‌سازی فیلتر اکسل</label>
+                <label class="check"><input id="rtlWorkbook" type="checkbox" checked /> راست‌چین بودن فایل خروجی</label>
+              </div>
+            </div>
+
+            <hr class="separator" />
+
+            <div class="button-row">
+              <button class="btn btn-small" id="exportConfigBtn" type="button">خروجی تنظیمات</button>
+              <label class="btn btn-small" for="importConfigInput">ورود تنظیمات</label>
+              <input id="importConfigInput" type="file" accept="application/json,.json" />
+              <button class="btn btn-danger btn-small" id="resetConfigBtn" type="button">بازنشانی</button>
+            </div>
+            <div class="field-help">تنظیمات به‌صورت خودکار در مرورگر ذخیره می‌شوند.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><h3>وضعیت</h3></div>
+          <div class="panel-body">
+            <div class="stats-grid">
+              <div class="stat"><span class="stat-value" id="statFiles">۰</span><span class="stat-label">فایل ورودی</span></div>
+              <div class="stat"><span class="stat-value" id="statRules">۰</span><span class="stat-label">قاعده فعال</span></div>
+              <div class="stat"><span class="stat-value" id="statSheets">۰</span><span class="stat-label">شیت پردازش‌شده</span></div>
+              <div class="stat"><span class="stat-value" id="statRows">۰</span><span class="stat-label">ردیف خروجی</span></div>
+            </div>
+
+            <div class="progress-wrap" id="progressWrap">
+              <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+              <div class="progress-text" id="progressText"></div>
+            </div>
+
+            <div id="statusNotice" class="notice notice-info" style="margin-top:12px; margin-bottom:0">فایل‌ها و قواعد را مشخص کنید.</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header"><h3>اجرا و دریافت خروجی</h3></div>
+          <div class="panel-body sticky-actions">
+            <button class="btn btn-primary btn-block" id="runBtn" type="button">اجرای استخراج و پیش‌نمایش</button>
+            <button class="btn btn-success btn-block" id="downloadBtn" type="button" disabled>دانلود فایل اکسل خروجی</button>
+            <button class="btn btn-block" id="validateBtn" type="button">بررسی صحت قواعد</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <div class="footer-note">برای فایل‌های بسیار بزرگ، پردازش به‌صورت ترتیبی انجام می‌شود تا مصرف حافظه کاهش یابد.</div>
+  </main>
+
+  <template id="ruleTemplate">
+    <article class="rule-card">
+      <div class="rule-top">
+        <div class="rule-title-wrap">
+          <span class="rule-number"></span>
+          <label class="check"><input class="rule-enabled" type="checkbox" checked /> فعال</label>
+          <span class="rule-summary">قاعده جدید</span>
+        </div>
+        <div class="button-row">
+          <button class="btn btn-small duplicate-rule" type="button">کپی</button>
+          <button class="btn btn-danger btn-small remove-rule" type="button">حذف</button>
+        </div>
+      </div>
+      <div class="rule-body">
+        <div class="form-grid">
+          <label class="field col-4">
+            <span class="field-title">نام شیت خروجی</span>
+            <input class="rule-output-name" type="text" placeholder="مثلاً واحد پرس" />
+          </label>
+          <label class="field col-4">
+            <span class="field-title">نوع استخراج</span>
+            <select class="rule-type">
+              <option value="table">محدوده جدولی</option>
+              <option value="cells">سلول‌های پراکنده</option>
+            </select>
+          </label>
+          <label class="field col-4">
+            <span class="field-title">فیلتر نام شیت‌های ورودی</span>
+            <input class="rule-sheet-filter" type="text" value="*" placeholder="* یا روز* یا !خلاصه" />
+            <span class="field-help">چند الگو را با ویرگول جدا کنید. ! برای حذف؛ مانند <code>روز*, !خلاصه</code>.</span>
+          </label>
+
+          <div class="col-12 type-panel table-panel active">
+            <div class="form-grid">
+              <label class="field col-6">
+                <span class="field-title">محدوده‌ها؛ هر خط یک محدوده</span>
+                <textarea class="rule-ranges" placeholder="پرس خط ۱ | A10:H25&#10;پرس خط ۲ | A30:H45"></textarea>
+                <span class="field-help">نام بخش اختیاری است. قالب: <code>نام بخش | A1:F20</code></span>
+              </label>
+              <div class="col-6">
+                <div class="form-grid">
+                  <label class="field col-12">
+                    <span class="field-title">سطر عنوان محدوده</span>
+                    <select class="rule-header-mode">
+                      <option value="first">سطر اول محدوده، عنوان ستون‌ها است</option>
+                      <option value="none">محدوده عنوان ندارد</option>
+                      <option value="custom">عنوان‌های سفارشی زیر</option>
+                    </select>
+                  </label>
+                  <label class="field col-12 custom-headers-field hidden">
+                    <span class="field-title">عنوان‌های سفارشی</span>
+                    <textarea class="rule-custom-headers rtl-input" placeholder="تاریخ، شیفت، مقدار تولید، توقف"></textarea>
+                    <span class="field-help">با ویرگول، خط جدید یا ; جدا کنید.</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 type-panel cells-panel">
+            <label class="field">
+              <span class="field-title">نگاشت ستون خروجی به سلول یا محدوده</span>
+              <textarea class="rule-mappings" placeholder="تاریخ = B2&#10;شیفت = E2&#10;مقدار تولید = F18&#10;توضیحات = B25:H25"></textarea>
+              <span class="field-help">از هر شیت یک ردیف خروجی ساخته می‌شود. محدوده چندسلولی با علامت « | » در یک سلول خروجی ترکیب می‌شود.</span>
+            </label>
+          </div>
+
+          <div class="col-12 checks">
+            <label class="check"><input class="meta-file" type="checkbox" checked /> نام فایل منبع</label>
+            <label class="check"><input class="meta-sheet" type="checkbox" checked /> نام شیت منبع</label>
+            <label class="check"><input class="meta-range" type="checkbox" checked /> محدوده منبع</label>
+            <label class="check table-only"><input class="meta-row" type="checkbox" /> شماره ردیف منبع</label>
+            <label class="check table-only"><input class="meta-section" type="checkbox" checked /> نام بخش محدوده</label>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const CONFIG_KEY = 'excel-custom-extractor-config-v1';
+      const MAX_PREVIEW_ROWS = 50;
+      const MAX_EXCEL_DATA_ROWS = 1048575;
+
+      const state = {
+        files: [],
+        rules: [],
+        results: new Map(),
+        processedSheets: 0,
+        totalRows: 0,
+        isRunning: false,
+        previewSheet: null
+      };
+
+      const el = Object.fromEntries([
+        'fileInput','dropZone','fileList','clearFilesBtn','rulesList','rulesEmpty','addRuleBtn','addExampleBtn',
+        'ruleTemplate','outputFileName','valueMode','includeHiddenSheets','fillMergedCells','skipEmptyRows',
+        'autoWidth','autoFilter','rtlWorkbook','exportConfigBtn','importConfigInput','resetConfigBtn','runBtn',
+        'downloadBtn','validateBtn','progressWrap','progressBar','progressText','statusNotice','logBox','previewEmpty',
+        'previewArea','previewTabs','previewTable','statFiles','statRules','statSheets','statRows'
+      ].map(id => [id, document.getElementById(id)]));
+
+      const faNumber = value => new Intl.NumberFormat('fa-IR').format(value || 0);
+      const waitFrame = () => new Promise(resolve => requestAnimationFrame(resolve));
+      const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `r-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+      const isBlank = value => value === null || value === undefined || String(value).trim() === '';
+
+      function defaultRule(overrides = {}) {
+        return {
+          id: uid(),
+          enabled: true,
+          outputName: '',
+          type: 'table',
+          sheetFilter: '*',
+          ranges: '',
+          headerMode: 'first',
+          customHeaders: '',
+          mappings: '',
+          metaFile: true,
+          metaSheet: true,
+          metaRange: true,
+          metaRow: false,
+          metaSection: true,
+          ...overrides
+        };
+      }
+
+      function defaultConfig() {
+        return {
+          version: 1,
+          globals: {
+            outputFileName: 'خروجی-استخراج.xlsx',
+            valueMode: 'raw',
+            includeHiddenSheets: false,
+            fillMergedCells: true,
+            skipEmptyRows: true,
+            autoWidth: true,
+            autoFilter: true,
+            rtlWorkbook: true
+          },
+          rules: [defaultRule({
+            outputName: 'واحد پرس',
+            type: 'table',
+            ranges: 'پرس | A10:H25'
+          })]
+        };
+      }
+
+      function readGlobals() {
+        return {
+          outputFileName: el.outputFileName.value.trim() || 'خروجی-استخراج.xlsx',
+          valueMode: el.valueMode.value,
+          includeHiddenSheets: el.includeHiddenSheets.checked,
+          fillMergedCells: el.fillMergedCells.checked,
+          skipEmptyRows: el.skipEmptyRows.checked,
+          autoWidth: el.autoWidth.checked,
+          autoFilter: el.autoFilter.checked,
+          rtlWorkbook: el.rtlWorkbook.checked
+        };
+      }
+
+      function applyGlobals(globals = {}) {
+        el.outputFileName.value = globals.outputFileName || 'خروجی-استخراج.xlsx';
+        el.valueMode.value = globals.valueMode === 'formatted' ? 'formatted' : 'raw';
+        el.includeHiddenSheets.checked = Boolean(globals.includeHiddenSheets);
+        el.fillMergedCells.checked = globals.fillMergedCells !== false;
+        el.skipEmptyRows.checked = globals.skipEmptyRows !== false;
+        el.autoWidth.checked = globals.autoWidth !== false;
+        el.autoFilter.checked = globals.autoFilter !== false;
+        el.rtlWorkbook.checked = globals.rtlWorkbook !== false;
+      }
+
+      function loadConfig() {
+        let config;
+        try {
+          config = JSON.parse(localStorage.getItem(CONFIG_KEY));
+        } catch (_) {
+          config = null;
+        }
+        if (!config || !Array.isArray(config.rules)) config = defaultConfig();
+        applyConfig(config);
+      }
+
+      function applyConfig(config) {
+        applyGlobals(config.globals || {});
+        state.rules = (config.rules || []).map(rule => defaultRule({ ...rule, id: rule.id || uid() }));
+        if (!state.rules.length) state.rules = [defaultRule()];
+        renderRules();
+        invalidateResults();
+        saveConfig();
+      }
+
+      function exportableConfig() {
+        syncRulesFromDOM();
+        return { version: 1, globals: readGlobals(), rules: state.rules };
+      }
+
+      let saveTimer;
+      function saveConfig() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => {
+          try { localStorage.setItem(CONFIG_KEY, JSON.stringify(exportableConfig())); }
+          catch (_) { /* local storage can be unavailable */ }
+        }, 150);
+      }
+
+      function addFiles(fileList) {
+        const allowed = /\.(xlsx|xls|xlsm|xlsb|ods|csv)$/i;
+        const currentKeys = new Set(state.files.map(item => `${item.file.name}|${item.file.size}|${item.file.lastModified}`));
+        for (const file of Array.from(fileList || [])) {
+          const key = `${file.name}|${file.size}|${file.lastModified}`;
+          if (!allowed.test(file.name) || currentKeys.has(key)) continue;
+          state.files.push({ id: uid(), file });
+          currentKeys.add(key);
+        }
+        renderFiles();
+        invalidateResults();
+      }
+
+      function renderFiles() {
+        el.fileList.innerHTML = '';
+        for (const item of state.files) {
+          const row = document.createElement('div');
+          row.className = 'file-item';
+          row.innerHTML = `
+            <div>
+              <div class="file-item-name" title="${escapeHtml(item.file.name)}">${escapeHtml(item.file.name)}</div>
+              <div class="file-item-meta">${formatBytes(item.file.size)}</div>
+            </div>
+            <button class="btn btn-danger btn-small" type="button" data-file-id="${item.id}">حذف</button>`;
+          el.fileList.appendChild(row);
+        }
+        updateStats();
+      }
+
+      function renderRules() {
+        el.rulesList.innerHTML = '';
+        state.rules.forEach((rule, index) => el.rulesList.appendChild(createRuleElement(rule, index)));
+        el.rulesEmpty.classList.toggle('hidden', state.rules.length > 0);
+        updateStats();
+      }
+
+      function createRuleElement(rule, index) {
+        const fragment = el.ruleTemplate.content.cloneNode(true);
+        const card = fragment.querySelector('.rule-card');
+        card.dataset.ruleId = rule.id;
+        card.querySelector('.rule-number').textContent = faNumber(index + 1);
+        setChecked(card, '.rule-enabled', rule.enabled);
+        setValue(card, '.rule-output-name', rule.outputName);
+        setValue(card, '.rule-type', rule.type);
+        setValue(card, '.rule-sheet-filter', rule.sheetFilter || '*');
+        setValue(card, '.rule-ranges', rule.ranges);
+        setValue(card, '.rule-header-mode', rule.headerMode);
+        setValue(card, '.rule-custom-headers', rule.customHeaders);
+        setValue(card, '.rule-mappings', rule.mappings);
+        setChecked(card, '.meta-file', rule.metaFile);
+        setChecked(card, '.meta-sheet', rule.metaSheet);
+        setChecked(card, '.meta-range', rule.metaRange);
+        setChecked(card, '.meta-row', rule.metaRow);
+        setChecked(card, '.meta-section', rule.metaSection);
+        refreshRuleCard(card);
+        return fragment;
+      }
+
+      function setValue(root, selector, value) {
+        const node = root.querySelector(selector);
+        if (node) node.value = value ?? '';
+      }
+
+      function setChecked(root, selector, value) {
+        const node = root.querySelector(selector);
+        if (node) node.checked = Boolean(value);
+      }
+
+      function ruleFromCard(card) {
+        return {
+          id: card.dataset.ruleId || uid(),
+          enabled: card.querySelector('.rule-enabled').checked,
+          outputName: card.querySelector('.rule-output-name').value.trim(),
+          type: card.querySelector('.rule-type').value,
+          sheetFilter: card.querySelector('.rule-sheet-filter').value.trim() || '*',
+          ranges: card.querySelector('.rule-ranges').value,
+          headerMode: card.querySelector('.rule-header-mode').value,
+          customHeaders: card.querySelector('.rule-custom-headers').value,
+          mappings: card.querySelector('.rule-mappings').value,
+          metaFile: card.querySelector('.meta-file').checked,
+          metaSheet: card.querySelector('.meta-sheet').checked,
+          metaRange: card.querySelector('.meta-range').checked,
+          metaRow: card.querySelector('.meta-row').checked,
+          metaSection: card.querySelector('.meta-section').checked
+        };
+      }
+
+      function syncRulesFromDOM() {
+        state.rules = Array.from(el.rulesList.querySelectorAll('.rule-card')).map(ruleFromCard);
+      }
+
+      function refreshRuleCard(card) {
+        const type = card.querySelector('.rule-type').value;
+        const enabled = card.querySelector('.rule-enabled').checked;
+        const outputName = card.querySelector('.rule-output-name').value.trim() || 'قاعده بدون نام';
+        const headerMode = card.querySelector('.rule-header-mode').value;
+        card.classList.toggle('is-disabled', !enabled);
+        card.querySelector('.rule-summary').textContent = `${outputName} — ${type === 'table' ? 'محدوده جدولی' : 'سلول‌های پراکنده'}`;
+        card.querySelector('.table-panel').classList.toggle('active', type === 'table');
+        card.querySelector('.cells-panel').classList.toggle('active', type === 'cells');
+        card.querySelectorAll('.table-only').forEach(node => node.classList.toggle('hidden', type !== 'table'));
+        card.querySelector('.custom-headers-field').classList.toggle('hidden', headerMode !== 'custom');
+      }
+
+      function invalidateResults() {
+        state.results = new Map();
+        state.processedSheets = 0;
+        state.totalRows = 0;
+        state.previewSheet = null;
+        el.downloadBtn.disabled = true;
+        el.previewArea.classList.add('hidden');
+        el.previewEmpty.classList.remove('hidden');
+        updateStats();
+      }
+
+      function parseRangeLines(text) {
+        return String(text || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean).map((line, idx) => {
+          let label = '';
+          let rangeText = line;
+          const pipeIndex = line.lastIndexOf('|');
+          if (pipeIndex >= 0) {
+            label = line.slice(0, pipeIndex).trim();
+            rangeText = line.slice(pipeIndex + 1).trim();
+          }
+          const normalized = rangeText.replace(/\$/g, '').toUpperCase();
+          if (!/^[A-Z]{1,3}\d+\s*:\s*[A-Z]{1,3}\d+$/.test(normalized) && !/^[A-Z]{1,3}\d+$/.test(normalized)) {
+            throw new Error(`محدوده نامعتبر در خط ${idx + 1}: ${rangeText}`);
+          }
+          return { label, range: normalized.replace(/\s+/g, '') };
+        });
+      }
+
+      function parseHeaders(text) {
+        return String(text || '').split(/[،,;\n\r]+/).map(item => item.trim()).filter(Boolean);
+      }
+
+      function parseMappings(text) {
+        return String(text || '').split(/\r?\n/).map(line => line.trim()).filter(Boolean).map((line, idx) => {
+          const match = line.match(/^(.+?)\s*(?:=|:)\s*([A-Za-z]{1,3}\d+(?:\s*:\s*[A-Za-z]{1,3}\d+)?)\s*$/);
+          if (!match) throw new Error(`نگاشت نامعتبر در خط ${idx + 1}: ${line}`);
+          return { name: match[1].trim(), address: match[2].replace(/\$/g, '').replace(/\s+/g, '').toUpperCase() };
+        });
+      }
+
+      function compileSheetFilter(text) {
+        const tokens = String(text || '*').split(/[،,\n\r]+/).map(t => t.trim()).filter(Boolean);
+        const positives = tokens.filter(t => !t.startsWith('!')).map(globToRegExp);
+        const negatives = tokens.filter(t => t.startsWith('!')).map(t => globToRegExp(t.slice(1)));
+        return name => {
+          const positiveMatch = positives.length === 0 || positives.some(regex => regex.test(name));
+          const negativeMatch = negatives.some(regex => regex.test(name));
+          return positiveMatch && !negativeMatch;
+        };
+      }
+
+      function globToRegExp(glob) {
+        const escaped = (glob || '*').replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.');
+        return new RegExp(`^${escaped}$`, 'i');
+      }
+
+      function validateRules(showSuccess = false) {
+        syncRulesFromDOM();
+        const errors = [];
+        const enabledRules = state.rules.filter(rule => rule.enabled);
+        if (!enabledRules.length) errors.push('حداقل یک قاعده فعال لازم است.');
+
+        enabledRules.forEach((rule, index) => {
+          const prefix = `قاعده ${index + 1}`;
+          if (!rule.outputName.trim()) errors.push(`${prefix}: نام شیت خروجی مشخص نشده است.`);
+          if (sanitizeSheetName(rule.outputName).length === 0) errors.push(`${prefix}: نام شیت خروجی نامعتبر است.`);
+          try { compileSheetFilter(rule.sheetFilter); } catch (error) { errors.push(`${prefix}: فیلتر شیت نامعتبر است (${error.message}).`); }
+          try {
+            if (rule.type === 'table') {
+              const ranges = parseRangeLines(rule.ranges);
+              if (!ranges.length) errors.push(`${prefix}: حداقل یک محدوده وارد کنید.`);
+              if (rule.headerMode === 'custom' && !parseHeaders(rule.customHeaders).length) errors.push(`${prefix}: عنوان‌های سفارشی وارد نشده‌اند.`);
+            } else {
+              const mappings = parseMappings(rule.mappings);
+              if (!mappings.length) errors.push(`${prefix}: حداقل یک نگاشت سلولی وارد کنید.`);
+              const names = mappings.map(m => m.name);
+              if (new Set(names).size !== names.length) errors.push(`${prefix}: نام ستون‌های نگاشت تکراری است.`);
+            }
+          } catch (error) { errors.push(`${prefix}: ${error.message}`); }
+        });
+
+        if (errors.length) {
+          setStatus(errors.join('\n'), 'danger');
+          log(`خطاهای اعتبارسنجی:\n- ${errors.join('\n- ')}`, true);
+          return { ok: false, errors };
+        }
+        if (showSuccess) {
+          setStatus(`${faNumber(enabledRules.length)} قاعده معتبر است.`, 'success');
+          log('اعتبارسنجی قواعد با موفقیت انجام شد.');
+        }
+        return { ok: true, errors: [] };
+      }
+
+      class ResultTable {
+        constructor(name) {
+          this.name = name;
+          this.columns = [];
+          this.columnSet = new Set();
+          this.rows = [];
+        }
+        add(row) {
+          for (const key of Object.keys(row)) {
+            if (!this.columnSet.has(key)) {
+              this.columnSet.add(key);
+              this.columns.push(key);
+            }
+          }
+          this.rows.push(row);
+        }
+      }
+
+      const mergeAnchorCache = new WeakMap();
+
+      function getCellObject(ws, row, col, fillMerged) {
+        const direct = ws['!data'] != null ? ws['!data']?.[row]?.[col] : ws[XLSX.utils.encode_cell({ r: row, c: col })];
+        if (direct || !fillMerged || !Array.isArray(ws['!merges'])) return direct;
+        let cache = mergeAnchorCache.get(ws);
+        if (!cache) { cache = new Map(); mergeAnchorCache.set(ws, cache); }
+        const key = `${row}:${col}`;
+        if (cache.has(key)) {
+          const anchor = cache.get(key);
+          if (!anchor) return undefined;
+          return ws['!data'] != null ? ws['!data']?.[anchor.r]?.[anchor.c] : ws[XLSX.utils.encode_cell(anchor)];
+        }
+        for (const merge of ws['!merges']) {
+          if (row >= merge.s.r && row <= merge.e.r && col >= merge.s.c && col <= merge.e.c) {
+            const anchor = { r: merge.s.r, c: merge.s.c };
+            cache.set(key, anchor);
+            return ws['!data'] != null ? ws['!data']?.[anchor.r]?.[anchor.c] : ws[XLSX.utils.encode_cell(anchor)];
+          }
+        }
+        cache.set(key, null);
+        return undefined;
+      }
+
+      function cellValue(ws, row, col, globals) {
+        const cell = getCellObject(ws, row, col, globals.fillMergedCells);
+        if (!cell) return '';
+        if (globals.valueMode === 'formatted') {
+          if (cell.w !== undefined) return cell.w;
+          if (cell.v instanceof Date) return cell.v.toLocaleString('fa-IR');
+          return cell.v ?? '';
+        }
+        return cell.v ?? '';
+      }
+
+      function rangeValues(ws, rangeText, globals) {
+        const range = XLSX.utils.decode_range(rangeText);
+        const rows = [];
+        for (let r = range.s.r; r <= range.e.r; r++) {
+          const row = [];
+          for (let c = range.s.c; c <= range.e.c; c++) row.push(cellValue(ws, r, c, globals));
+          rows.push(row);
+        }
+        return { range, rows };
+      }
+
+      function uniqueHeaders(headers) {
+        const counts = new Map();
+        return headers.map((header, index) => {
+          let base = String(header ?? '').trim();
+          if (!base) base = `ستون ${faNumber(index + 1)}`;
+          const count = (counts.get(base) || 0) + 1;
+          counts.set(base, count);
+          return count === 1 ? base : `${base}_${count}`;
+        });
+      }
+
+      function metadataFor(rule, fileName, sheetName, rangeText, sourceRow, section) {
+        const meta = {};
+        if (rule.metaFile) meta['_فایل منبع'] = fileName;
+        if (rule.metaSheet) meta['_شیت منبع'] = sheetName;
+        if (rule.metaRange) meta['_محدوده منبع'] = rangeText || '';
+        if (rule.type === 'table' && rule.metaRow && sourceRow != null) meta['_ردیف منبع'] = sourceRow;
+        if (rule.type === 'table' && rule.metaSection) meta['_بخش'] = section || '';
+        return meta;
+      }
+
+      function extractTableRule(ws, rule, context, result, globals) {
+        const ranges = parseRangeLines(rule.ranges);
+        const customHeaders = parseHeaders(rule.customHeaders);
+        let added = 0;
+
+        for (const item of ranges) {
+          const { range, rows } = rangeValues(ws, item.range, globals);
+          if (!rows.length) continue;
+          const width = range.e.c - range.s.c + 1;
+          let headers;
+          let startRowOffset;
+
+          if (rule.headerMode === 'first') {
+            headers = uniqueHeaders(rows[0]);
+            startRowOffset = 1;
+          } else if (rule.headerMode === 'custom') {
+            headers = uniqueHeaders(Array.from({ length: width }, (_, i) => customHeaders[i] || `ستون ${faNumber(i + 1)}`));
+            startRowOffset = 0;
+          } else {
+            headers = uniqueHeaders(Array.from({ length: width }, (_, i) => `ستون ${faNumber(i + 1)}`));
+            startRowOffset = 0;
+          }
+
+          for (let i = startRowOffset; i < rows.length; i++) {
+            const values = rows[i];
+            if (globals.skipEmptyRows && values.every(isBlank)) continue;
+            const rowObject = metadataFor(rule, context.fileName, context.sheetName, item.range, range.s.r + i + 1, item.label);
+            for (let c = 0; c < headers.length; c++) rowObject[headers[c]] = values[c] ?? '';
+            result.add(rowObject);
+            added++;
+          }
+        }
+        return added;
+      }
+
+      function getAddressValue(ws, address, globals) {
+        const decoded = XLSX.utils.decode_range(address);
+        if (decoded.s.r === decoded.e.r && decoded.s.c === decoded.e.c) return cellValue(ws, decoded.s.r, decoded.s.c, globals);
+        const values = [];
+        for (let r = decoded.s.r; r <= decoded.e.r; r++) {
+          for (let c = decoded.s.c; c <= decoded.e.c; c++) {
+            const value = cellValue(ws, r, c, globals);
+            if (!isBlank(value)) values.push(value);
+          }
+        }
+        return values.map(value => value instanceof Date ? value.toISOString() : String(value)).join(' | ');
+      }
+
+      function extractCellsRule(ws, rule, context, result, globals) {
+        const mappings = parseMappings(rule.mappings);
+        const rowObject = metadataFor(rule, context.fileName, context.sheetName, mappings.map(m => m.address).join(', '), null, '');
+        const values = [];
+        for (const mapping of mappings) {
+          const value = getAddressValue(ws, mapping.address, globals);
+          rowObject[mapping.name] = value;
+          values.push(value);
+        }
+        if (globals.skipEmptyRows && values.every(isBlank)) return 0;
+        result.add(rowObject);
+        return 1;
+      }
+
+      function getResultTable(outputName) {
+        const safeName = sanitizeSheetName(outputName) || 'خروجی';
+        if (!state.results.has(safeName)) state.results.set(safeName, new ResultTable(safeName));
+        return state.results.get(safeName);
+      }
+
+      async function runExtraction() {
+        if (state.isRunning) return;
+        if (typeof XLSX === 'undefined') {
+          setStatus('کتابخانه SheetJS بارگذاری نشد. اتصال اینترنت یا دسترسی به CDN را بررسی کنید.', 'danger');
+          return;
+        }
+        const validation = validateRules(false);
+        if (!validation.ok) return;
+        if (!state.files.length) {
+          setStatus('حداقل یک فایل اکسل انتخاب کنید.', 'danger');
+          return;
+        }
+
+        state.isRunning = true;
+        state.results = new Map();
+        state.processedSheets = 0;
+        state.totalRows = 0;
+        state.previewSheet = null;
+        el.runBtn.disabled = true;
+        el.downloadBtn.disabled = true;
+        el.progressWrap.classList.add('visible');
+        el.progressBar.style.width = '0%';
+        el.logBox.textContent = '';
+        setStatus('پردازش در حال اجرا است...', 'info');
+
+        syncRulesFromDOM();
+        const globals = readGlobals();
+        const rules = state.rules.filter(rule => rule.enabled).map(rule => ({ ...rule, matchesSheet: compileSheetFilter(rule.sheetFilter) }));
+        const totalFiles = state.files.length;
+        let failedFiles = 0;
+        let matchedRuleRuns = 0;
+
+        try {
+          for (let fileIndex = 0; fileIndex < state.files.length; fileIndex++) {
+            const fileItem = state.files[fileIndex];
+            const file = fileItem.file;
+            updateProgress(fileIndex / totalFiles, `در حال خواندن ${file.name}`);
+            log(`READ ${file.name}`);
+
+            try {
+              const buffer = await file.arrayBuffer();
+              const workbook = XLSX.read(buffer, {
+                type: 'array',
+                cellDates: true,
+                cellNF: true,
+                cellText: true,
+                dense: true
+              });
+
+              const sheetMeta = workbook.Workbook?.Sheets || [];
+              for (let sheetIndex = 0; sheetIndex < workbook.SheetNames.length; sheetIndex++) {
+                const sheetName = workbook.SheetNames[sheetIndex];
+                const hidden = Number(sheetMeta[sheetIndex]?.Hidden || 0) > 0;
+                if (hidden && !globals.includeHiddenSheets) continue;
+
+                const matchingRules = rules.filter(rule => rule.matchesSheet(sheetName));
+                if (!matchingRules.length) continue;
+                const ws = workbook.Sheets[sheetName];
+                if (!ws || !ws['!ref']) continue;
+
+                state.processedSheets++;
+                for (const rule of matchingRules) {
+                  const result = getResultTable(rule.outputName);
+                  const context = { fileName: file.name, sheetName };
+                  const count = rule.type === 'table'
+                    ? extractTableRule(ws, rule, context, result, globals)
+                    : extractCellsRule(ws, rule, context, result, globals);
+                  state.totalRows += count;
+                  matchedRuleRuns++;
+                }
+
+                if (sheetIndex % 4 === 0) {
+                  const filePart = (sheetIndex + 1) / Math.max(1, workbook.SheetNames.length);
+                  updateProgress((fileIndex + filePart) / totalFiles, `${file.name} — شیت ${sheetName}`);
+                  updateStats();
+                  await waitFrame();
+                }
+              }
+              log(`OK   ${file.name} (${faNumber(workbook.SheetNames.length)} sheets)`);
+            } catch (error) {
+              failedFiles++;
+              log(`FAIL ${file.name}: ${error.message}`, true);
+            }
+            updateProgress((fileIndex + 1) / totalFiles, `${faNumber(fileIndex + 1)} از ${faNumber(totalFiles)} فایل`);
+            await waitFrame();
+          }
+
+          for (const [name, table] of Array.from(state.results.entries())) {
+            if (!table.rows.length) state.results.delete(name);
+          }
+
+          renderPreview();
+          updateStats();
+          const outputSheets = state.results.size;
+          if (!outputSheets) {
+            setStatus('هیچ داده‌ای استخراج نشد. آدرس محدوده‌ها، فیلتر شیت‌ها و وجود داده در سلول‌ها را بررسی کنید.', 'warning');
+            log('DONE No output rows were generated.', true);
+          } else {
+            el.downloadBtn.disabled = false;
+            const failureText = failedFiles ? `؛ ${faNumber(failedFiles)} فایل دارای خطا بود` : '';
+            setStatus(`${faNumber(state.totalRows)} ردیف در ${faNumber(outputSheets)} شیت خروجی ساخته شد${failureText}.`, failedFiles ? 'warning' : 'success');
+            log(`DONE ${state.totalRows} rows, ${outputSheets} output sheets, ${matchedRuleRuns} matched rule runs.`);
+          }
+        } finally {
+          state.isRunning = false;
+          el.runBtn.disabled = false;
+          updateProgress(1, 'پردازش پایان یافت');
+        }
+      }
+
+      function buildWorkbook() {
+        if (!state.results.size) throw new Error('خروجی قابل دانلود وجود ندارد.');
+        const globals = readGlobals();
+        const workbook = XLSX.utils.book_new();
+        if (globals.rtlWorkbook) workbook.Workbook = { Views: [{ RTL: true }] };
+        const usedNames = new Set();
+
+        for (const table of state.results.values()) {
+          for (let offset = 0, part = 1; offset < table.rows.length; offset += MAX_EXCEL_DATA_ROWS, part++) {
+            const rows = table.rows.slice(offset, offset + MAX_EXCEL_DATA_ROWS);
+            const baseName = part === 1 ? table.name : `${table.name}_${part}`;
+            const sheetName = uniqueSheetName(baseName, usedNames);
+            const ws = XLSX.utils.json_to_sheet(rows, { header: table.columns, skipHeader: false, dense: true });
+
+            if (globals.autoWidth) ws['!cols'] = calculateColumnWidths(table.columns, rows);
+            if (globals.autoFilter && ws['!ref']) {
+              const range = XLSX.utils.decode_range(ws['!ref']);
+              ws['!autofilter'] = { ref: XLSX.utils.encode_range({ s: range.s, e: { r: range.e.r, c: range.e.c } }) };
+            }
+            XLSX.utils.book_append_sheet(workbook, ws, sheetName);
+          }
+        }
+        return workbook;
+      }
+
+      function calculateColumnWidths(columns, rows) {
+        const sample = rows.slice(0, 700);
+        return columns.map(column => {
+          let width = Math.min(35, Math.max(9, displayLength(column) + 2));
+          for (const row of sample) width = Math.min(45, Math.max(width, displayLength(row[column]) + 2));
+          return { wch: width };
+        });
+      }
+
+      function displayLength(value) {
+        if (value == null) return 0;
+        const text = value instanceof Date ? value.toISOString() : String(value);
+        return Math.min(60, Array.from(text).reduce((sum, char) => sum + (/[^\x00-\xff]/.test(char) ? 1.25 : 1), 0));
+      }
+
+      function downloadWorkbook() {
+        try {
+          const workbook = buildWorkbook();
+          let fileName = readGlobals().outputFileName || 'خروجی-استخراج.xlsx';
+          if (!/\.xlsx$/i.test(fileName)) fileName += '.xlsx';
+          XLSX.writeFile(workbook, fileName, { compression: true, bookType: 'xlsx' });
+          log(`WRITE ${fileName}`);
+        } catch (error) {
+          setStatus(error.message, 'danger');
+          log(`WRITE FAIL: ${error.message}`, true);
+        }
+      }
+
+      function renderPreview() {
+        el.previewTabs.innerHTML = '';
+        el.previewTable.innerHTML = '';
+        const names = Array.from(state.results.keys());
+        if (!names.length) {
+          el.previewArea.classList.add('hidden');
+          el.previewEmpty.classList.remove('hidden');
+          return;
+        }
+        el.previewEmpty.classList.add('hidden');
+        el.previewArea.classList.remove('hidden');
+        if (!state.previewSheet || !state.results.has(state.previewSheet)) state.previewSheet = names[0];
+
+        for (const name of names) {
+          const table = state.results.get(name);
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = `tab-btn${name === state.previewSheet ? ' active' : ''}`;
+          button.dataset.previewSheet = name;
+          button.textContent = `${name} (${faNumber(table.rows.length)})`;
+          el.previewTabs.appendChild(button);
+        }
+        renderPreviewTable(state.previewSheet);
+      }
+
+      function renderPreviewTable(name) {
+        const table = state.results.get(name);
+        if (!table) return;
+        const thead = document.createElement('thead');
+        const headRow = document.createElement('tr');
+        for (const column of table.columns) {
+          const th = document.createElement('th');
+          th.textContent = column;
+          headRow.appendChild(th);
+        }
+        thead.appendChild(headRow);
+
+        const tbody = document.createElement('tbody');
+        for (const row of table.rows.slice(0, MAX_PREVIEW_ROWS)) {
+          const tr = document.createElement('tr');
+          for (const column of table.columns) {
+            const td = document.createElement('td');
+            const value = row[column];
+            td.textContent = value instanceof Date ? value.toLocaleString('fa-IR') : (value ?? '');
+            td.title = td.textContent;
+            tr.appendChild(td);
+          }
+          tbody.appendChild(tr);
+        }
+        el.previewTable.replaceChildren(thead, tbody);
+      }
+
+      function updateStats() {
+        el.statFiles.textContent = faNumber(state.files.length);
+        const activeRules = state.rules.filter(rule => rule.enabled).length;
+        el.statRules.textContent = faNumber(activeRules);
+        el.statSheets.textContent = faNumber(state.processedSheets);
+        el.statRows.textContent = faNumber(state.totalRows);
+      }
+
+      function updateProgress(value, text) {
+        const percent = Math.max(0, Math.min(100, Math.round(value * 100)));
+        el.progressBar.style.width = `${percent}%`;
+        el.progressText.textContent = `${faNumber(percent)}٪ — ${text || ''}`;
+      }
+
+      function setStatus(message, type = 'info') {
+        el.statusNotice.className = `notice notice-${type}`;
+        el.statusNotice.style.marginTop = '12px';
+        el.statusNotice.style.marginBottom = '0';
+        el.statusNotice.style.whiteSpace = 'pre-line';
+        el.statusNotice.textContent = message;
+      }
+
+      function log(message, isError = false) {
+        const time = new Date().toLocaleTimeString('fa-IR');
+        const line = `[${time}] ${isError ? 'ERROR ' : ''}${message}`;
+        el.logBox.textContent += `${el.logBox.textContent ? '\n' : ''}${line}`;
+        el.logBox.scrollTop = el.logBox.scrollHeight;
+      }
+
+      function sanitizeSheetName(name) {
+        return String(name || '').replace(/[\\/*?:\[\]]/g, '-').replace(/^'+|'+$/g, '').trim().slice(0, 31);
+      }
+
+      function uniqueSheetName(base, used) {
+        let name = sanitizeSheetName(base) || 'خروجی';
+        let counter = 2;
+        while (used.has(name.toLowerCase())) {
+          const suffix = `_${counter++}`;
+          name = `${sanitizeSheetName(base).slice(0, 31 - suffix.length)}${suffix}`;
+        }
+        used.add(name.toLowerCase());
+        return name;
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[char]);
+      }
+
+      function formatBytes(bytes) {
+        if (!bytes) return '۰ بایت';
+        const units = ['بایت', 'KB', 'MB', 'GB'];
+        const index = Math.min(units.length - 1, Math.floor(Math.log(bytes) / Math.log(1024)));
+        return `${new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 1 }).format(bytes / Math.pow(1024, index))} ${units[index]}`;
+      }
+
+      function downloadJson(data, fileName) {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = fileName;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      el.fileInput.addEventListener('change', event => { addFiles(event.target.files); event.target.value = ''; });
+      el.dropZone.addEventListener('dragover', event => { event.preventDefault(); el.dropZone.classList.add('dragover'); });
+      el.dropZone.addEventListener('dragleave', () => el.dropZone.classList.remove('dragover'));
+      el.dropZone.addEventListener('drop', event => {
+        event.preventDefault();
+        el.dropZone.classList.remove('dragover');
+        addFiles(event.dataTransfer.files);
+      });
+
+      el.fileList.addEventListener('click', event => {
+        const button = event.target.closest('[data-file-id]');
+        if (!button) return;
+        state.files = state.files.filter(item => item.id !== button.dataset.fileId);
+        renderFiles();
+        invalidateResults();
+      });
+
+      el.clearFilesBtn.addEventListener('click', () => {
+        state.files = [];
+        renderFiles();
+        invalidateResults();
+      });
+
+      el.addRuleBtn.addEventListener('click', () => {
+        syncRulesFromDOM();
+        state.rules.push(defaultRule());
+        renderRules();
+        saveConfig();
+        invalidateResults();
+      });
+
+      el.addExampleBtn.addEventListener('click', () => {
+        syncRulesFromDOM();
+        state.rules.push(defaultRule({
+          outputName: 'واحد برق',
+          type: 'cells',
+          sheetFilter: '*',
+          mappings: 'تاریخ = B2\nشیفت = E2\nمقدار مصرف = F18\nتوضیحات = B25:H25',
+          metaRow: false,
+          metaSection: false
+        }));
+        renderRules();
+        saveConfig();
+        invalidateResults();
+      });
+
+      el.rulesList.addEventListener('input', event => {
+        const card = event.target.closest('.rule-card');
+        if (!card) return;
+        refreshRuleCard(card);
+        syncRulesFromDOM();
+        updateStats();
+        saveConfig();
+        invalidateResults();
+      });
+
+      el.rulesList.addEventListener('change', event => {
+        const card = event.target.closest('.rule-card');
+        if (!card) return;
+        refreshRuleCard(card);
+        syncRulesFromDOM();
+        updateStats();
+        saveConfig();
+        invalidateResults();
+      });
+
+      el.rulesList.addEventListener('click', event => {
+        const card = event.target.closest('.rule-card');
+        if (!card) return;
+        if (event.target.closest('.remove-rule')) {
+          state.rules = state.rules.filter(rule => rule.id !== card.dataset.ruleId);
+          renderRules();
+          saveConfig();
+          invalidateResults();
+        }
+        if (event.target.closest('.duplicate-rule')) {
+          syncRulesFromDOM();
+          const source = state.rules.find(rule => rule.id === card.dataset.ruleId);
+          if (!source) return;
+          const index = state.rules.findIndex(rule => rule.id === source.id);
+          state.rules.splice(index + 1, 0, defaultRule({ ...source, id: uid(), outputName: `${source.outputName} کپی` }));
+          renderRules();
+          saveConfig();
+          invalidateResults();
+        }
+      });
+
+      [el.outputFileName, el.valueMode, el.includeHiddenSheets, el.fillMergedCells, el.skipEmptyRows, el.autoWidth, el.autoFilter, el.rtlWorkbook]
+        .forEach(node => node.addEventListener('change', () => { saveConfig(); invalidateResults(); }));
+      el.outputFileName.addEventListener('input', saveConfig);
+
+      el.exportConfigBtn.addEventListener('click', () => downloadJson(exportableConfig(), 'تنظیمات-استخراج-اکسل.json'));
+      el.importConfigInput.addEventListener('change', async event => {
+        const file = event.target.files?.[0];
+        event.target.value = '';
+        if (!file) return;
+        try {
+          const config = JSON.parse(await file.text());
+          if (!config || !Array.isArray(config.rules)) throw new Error('ساختار فایل تنظیمات معتبر نیست.');
+          applyConfig(config);
+          setStatus('تنظیمات با موفقیت وارد شد.', 'success');
+        } catch (error) { setStatus(`خطا در ورود تنظیمات: ${error.message}`, 'danger'); }
+      });
+
+      el.resetConfigBtn.addEventListener('click', () => {
+        applyConfig(defaultConfig());
+        setStatus('تنظیمات به حالت اولیه بازگشت.', 'info');
+      });
+
+      el.validateBtn.addEventListener('click', () => validateRules(true));
+      el.runBtn.addEventListener('click', runExtraction);
+      el.downloadBtn.addEventListener('click', downloadWorkbook);
+      el.previewTabs.addEventListener('click', event => {
+        const button = event.target.closest('[data-preview-sheet]');
+        if (!button) return;
+        state.previewSheet = button.dataset.previewSheet;
+        el.previewTabs.querySelectorAll('.tab-btn').forEach(node => node.classList.toggle('active', node === button));
+        renderPreviewTable(state.previewSheet);
+      });
+
+      loadConfig();
+      renderFiles();
+      updateStats();
+    })();
+  </script>
+</body>
+</html>

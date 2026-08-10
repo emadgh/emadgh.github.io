@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <title>نمایش کارتی اکسل</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f5f7;
+      --card: #fff;
+      --text: #172033;
+      --muted: #6b7280;
+      --line: #e1e6eb;
+      --soft: #f7f8fa;
+      --primary: #0f766e;
+      --primary-soft: #e8f7f4;
+      --success: #15803d;
+      --success-soft: #edf9f0;
+      --warning: #a16207;
+      --warning-soft: #fff8e7;
+      --danger: #b42318;
+      font-family: Tahoma, "Vazirmatn", "IRANSans", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button, select, input[type="checkbox"] { cursor: pointer; }
+
+    .app {
+      width: min(1280px, 100%);
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.5;
+    }
+
+    .hint {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 11px;
+    }
+
+    .upload {
+      position: relative;
+      min-height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px;
+      border: 1.5px dashed #aab5c0;
+      text-align: center;
+      transition: .15s ease;
+    }
+
+    .upload.dragover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .upload input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+    }
+
+    .upload-icon {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--primary);
+      color: white;
+      font-weight: 900;
+      font-size: 15px;
+    }
+
+    .upload-title { font-size: 13px; font-weight: 800; }
+    .upload-help { margin-top: 3px; color: var(--muted); font-size: 10px; }
+
+    .workspace { display: none; }
+    .workspace.ready { display: block; }
+
+    .controls {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: 1.1fr 2.3fr 1fr 1.35fr auto;
+      gap: 7px;
+      align-items: end;
+      padding: 8px;
+      box-shadow: 0 5px 16px rgba(23, 32, 51, .05);
+    }
+
+    .field { min-width: 0; }
+
+    .field label {
+      display: block;
+      margin: 0 2px 4px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .control,
+    .field select,
+    .field input,
+    .field textarea {
+      width: 100%;
+      height: 34px;
+      min-width: 0;
+      padding: 6px 9px;
+      border: 1px solid #cfd6dd;
+      border-radius: 8px;
+      outline: none;
+      background: white;
+      color: var(--text);
+      font-size: 11px;
+    }
+
+    .field textarea {
+      resize: none;
+      line-height: 20px;
+      overflow-y: auto;
+    }
+
+    .field select:focus,
+    .field input:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(15, 118, 110, .1);
+    }
+
+    .sort-wrap {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 34px;
+      gap: 5px;
+    }
+
+    .icon-btn,
+    .text-btn {
+      height: 34px;
+      border: 1px solid #cfd6dd;
+      border-radius: 8px;
+      background: white;
+      color: #425066;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .icon-btn { width: 34px; font-size: 15px; }
+    .icon-btn:hover, .text-btn:hover { border-color: #9ca8b5; }
+
+    .file-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 8px 0;
+      padding: 7px 9px;
+    }
+
+    .file-details { min-width: 0; }
+
+    .file-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .meta {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .file-actions {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .count {
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: #526174;
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .text-btn {
+      padding: 0 9px;
+      color: var(--danger);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+      gap: 8px;
+    }
+
+    .card {
+      position: relative;
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid #d8dee5;
+      border-radius: 11px;
+      background: var(--card);
+      overflow: hidden;
+      transition: border-color .15s ease, opacity .15s ease, box-shadow .15s ease;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 0 auto;
+      width: 3px;
+      background: #d69e2e;
+    }
+
+    .card.checked {
+      border-color: #a9d9b6;
+      box-shadow: 0 3px 12px rgba(21, 128, 61, .07);
+    }
+
+    .card.checked::before { background: #22a05a; }
+    .card:not(.checked) { background: #fcfcfd; }
+
+    .card-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: start;
+      margin-bottom: 7px;
+      padding-right: 3px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+    }
+
+    .card-subtitle {
+      margin-top: 1px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .check-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 28px;
+      padding: 3px 6px;
+      border: 1px solid #d3dae1;
+      border-radius: 8px;
+      background: white;
+      color: #59677a;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .checked .check-label {
+      border-color: #b8dec1;
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .check-label input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--success);
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .tag {
+      max-width: 100%;
+      padding: 3px 6px;
+      border-radius: 999px;
+      background: #f0f3f6;
+      color: #526174;
+      font-size: 9px;
+      font-weight: 800;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tag.state-on { background: var(--success-soft); color: var(--success); }
+    .tag.state-off { background: var(--warning-soft); color: var(--warning); }
+
+    .data-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 10px;
+    }
+
+    .data-item {
+      min-width: 0;
+      padding: 5px 2px 6px;
+      border-top: 1px solid #edf0f3;
+    }
+
+    .data-item.wide { grid-column: 1 / -1; }
+
+    .data-label {
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.45;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .data-value {
+      min-width: 0;
+      font-size: 11.5px;
+      line-height: 1.6;
+      font-weight: 700;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      grid-column: 1 / -1;
+      padding: 34px 16px;
+      border: 1px dashed #aeb8c2;
+      border-radius: 11px;
+      background: white;
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+    }
+
+    .message {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border: 1px solid #fecaca;
+      border-radius: 9px;
+      background: #fff1f2;
+      color: var(--danger);
+      font-size: 10px;
+      line-height: 1.7;
+    }
+
+    .message.show { display: block; }
+
+    .loading {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      background: rgba(243, 245, 247, .82);
+      backdrop-filter: blur(2px);
+    }
+
+    .loading.show { display: grid; }
+
+    .loading-box {
+      padding: 12px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 850px) {
+      .controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .search-field { grid-column: 1 / -1; grid-row: 1; }
+    }
+
+    @media (max-width: 520px) {
+      .app { padding: 8px; }
+      .topbar { margin-bottom: 7px; }
+      h1 { font-size: 16px; }
+      .hint { display: none; }
+      .upload { min-height: 76px; padding: 10px; }
+      .controls { top: 0; gap: 5px; padding: 6px; }
+      .control, .field select, .field input, .field textarea, .icon-btn, .text-btn { height: 32px; }
+      .sort-wrap { grid-template-columns: minmax(0, 1fr) 32px; }
+      .icon-btn { width: 32px; }
+      .file-line { margin: 6px 0; }
+      .cards { grid-template-columns: 1fr; gap: 6px; }
+      .card { padding: 9px; border-radius: 9px; }
+      .card-head { grid-template-columns: minmax(0, 1fr) auto; }
+      .card-title { font-size: 13px; }
+      .data-list { column-gap: 8px; }
+      .data-item { padding: 4px 1px 5px; }
+      .data-label { font-size: 8.5px; }
+      .data-value { font-size: 11px; }
+    }
+  </style>
+
+  <script src="../assets/xlsx.full.min.js"></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>نمایش کارتی اکسل</h1>
+        <p class="hint">فایل فقط داخل مرورگر خوانده می‌شود.</p>
+      </div>
+    </header>
+
+    <section id="upload" class="upload panel" aria-label="انتخاب فایل اکسل">
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.xlsm,.xlsb,.csv" aria-label="انتخاب فایل اکسل">
+      <div class="upload-icon">X</div>
+      <div>
+        <div class="upload-title">انتخاب یا رها کردن فایل اکسل</div>
+        <div class="upload-help">XLSX، XLS، XLSM، XLSB و CSV</div>
+      </div>
+    </section>
+
+    <div id="message" class="message" role="alert"></div>
+
+    <section id="workspace" class="workspace">
+      <div class="controls panel">
+        <div class="field">
+          <label for="sheetSelect">شیت</label>
+          <select id="sheetSelect"></select>
+        </div>
+
+        <div class="field search-field">
+          <label for="searchInput">جستجو در اطلاعات</label>
+          <textarea id="searchInput" rows="1" placeholder="جستجو؛ هر خط یک عبارت"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="statusFilter">وضعیت</label>
+          <select id="statusFilter">
+            <option value="all">همه</option>
+            <option value="checked">ثبت‌شده</option>
+            <option value="unchecked">ثبت‌نشده</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="sortSelect">مرتب‌سازی</label>
+          <div class="sort-wrap">
+            <select id="sortSelect"></select>
+            <button id="sortDirection" class="icon-btn" type="button" title="تغییر جهت مرتب‌سازی" aria-label="تغییر جهت مرتب‌سازی">↑</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>&nbsp;</label>
+          <button id="resetFilters" class="text-btn" type="button">پاک‌کردن</button>
+        </div>
+      </div>
+
+      <div class="file-line panel">
+        <div class="file-details">
+          <div id="fileName" class="file-name"></div>
+          <div id="sheetMeta" class="meta"></div>
+        </div>
+        <div class="file-actions">
+          <span id="visibleCount" class="count">۰ مورد</span>
+          <button id="closeFile" class="text-btn" type="button">فایل جدید</button>
+        </div>
+      </div>
+
+      <div id="cards" class="cards" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <div id="loading" class="loading" aria-hidden="true">
+    <div class="loading-box">در حال خواندن فایل…</div>
+  </div>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const byId = (id) => document.getElementById(id);
+    const el = {
+      upload: byId("upload"),
+      fileInput: byId("fileInput"),
+      workspace: byId("workspace"),
+      message: byId("message"),
+      loading: byId("loading"),
+      sheetSelect: byId("sheetSelect"),
+      searchInput: byId("searchInput"),
+      statusFilter: byId("statusFilter"),
+      sortSelect: byId("sortSelect"),
+      sortDirection: byId("sortDirection"),
+      resetFilters: byId("resetFilters"),
+      fileName: byId("fileName"),
+      sheetMeta: byId("sheetMeta"),
+      visibleCount: byId("visibleCount"),
+      closeFile: byId("closeFile"),
+      cards: byId("cards")
+    };
+
+    const state = {
+      workbook: null,
+      file: null,
+      fileKey: "",
+      sheetName: "",
+      headers: [],
+      rows: [],
+      visibleRows: [],
+      checks: {},
+      direction: 1
+    };
+
+    const faNumber = new Intl.NumberFormat("fa-IR");
+    const collator = new Intl.Collator("fa", { numeric: true, sensitivity: "base" });
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function normalizeText(value) {
+      return String(value ?? "")
+        .replace(/ي/g, "ی")
+        .replace(/ك/g, "ک")
+        .replace(/[\u064B-\u065F\u0670]/g, "")
+        .toLocaleLowerCase("fa-IR")
+        .trim();
+    }
+
+    function isPersonnelNumber(header) {
+      return /شماره\s*پرسنلی|کد\s*پرسنلی/.test(normalizeText(header));
+    }
+
+    function isHiddenHeader(header) {
+      return /^تاریخ\s*ثبت$/.test(normalizeText(header));
+    }
+
+    function setMessage(text = "") {
+      el.message.textContent = text;
+      el.message.classList.toggle("show", Boolean(text));
+    }
+
+    function setLoading(active) {
+      el.loading.classList.toggle("show", active);
+      el.loading.setAttribute("aria-hidden", String(!active));
+    }
+
+    function pad2(value) { return String(value).padStart(2, "0"); }
+    function div(a, b) { return Math.trunc(a / b); }
+    function mod(a, b) { return a - Math.trunc(a / b) * b; }
+
+    function gregorianToJalali(gy, gm, gd) {
+      const gdm = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+      let jy;
+      if (gy > 1600) { jy = 979; gy -= 1600; }
+      else { jy = 0; gy -= 621; }
+      const gy2 = gm > 2 ? gy + 1 : gy;
+      let days = 365 * gy + div(gy2 + 3, 4) - div(gy2 + 99, 100) + div(gy2 + 399, 400) - 80 + gd + gdm[gm - 1];
+      jy += 33 * div(days, 12053);
+      days = mod(days, 12053);
+      jy += 4 * div(days, 1461);
+      days = mod(days, 1461);
+      if (days > 365) {
+        jy += div(days - 1, 365);
+        days = mod(days - 1, 365);
+      }
+      const jm = days < 186 ? 1 + div(days, 31) : 7 + div(days - 186, 30);
+      const jd = 1 + (days < 186 ? mod(days, 31) : mod(days - 186, 30));
+      return [jy, jm, jd];
+    }
+
+    function formatValue(raw, displayed, header) {
+      if (raw === null || raw === undefined || raw === "") return "";
+      const h = normalizeText(header);
+
+      if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+        const [jy, jm, jd] = gregorianToJalali(raw.getFullYear(), raw.getMonth() + 1, raw.getDate());
+        return `${jy}/${pad2(jm)}/${pad2(jd)}`;
+      }
+
+      if (isPersonnelNumber(header)) {
+        const personnelValue = String(displayed || raw).trim();
+        return personnelValue.replace(/[,،٬\s]/g, "");
+      }
+
+      if (typeof raw === "number" && Number.isFinite(raw)) {
+        if (h.includes("تاریخ") && raw > 20000 && raw < 80000) {
+          const d = new Date(Date.UTC(1899, 11, 30) + Math.floor(raw) * 86400000);
+          const [jy, jm, jd] = gregorianToJalali(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate());
+          return `${jy}/${pad2(jm)}/${pad2(jd)}`;
+        }
+
+        if ((h.includes("ساعت") || h.includes("زمان")) && raw >= 0 && raw < 2) {
+          const minutes = Math.round((raw % 1) * 1440) % 1440;
+          return `${pad2(Math.floor(minutes / 60))}:${pad2(minutes % 60)}`;
+        }
+
+        if ((h.includes("مدت") || h.includes("زمان صرف")) && raw > 0 && raw < 10) {
+          const minutes = Math.round(raw * 1440);
+          const hours = Math.floor(minutes / 60);
+          const rest = minutes % 60;
+          if (hours && rest) return `${faNumber.format(hours)} ساعت و ${faNumber.format(rest)} دقیقه`;
+          if (hours) return `${faNumber.format(hours)} ساعت`;
+          return `${faNumber.format(rest)} دقیقه`;
+        }
+
+        if (displayed && displayed !== String(raw)) return String(displayed).trim();
+        return faNumber.format(raw);
+      }
+
+      return String(displayed || raw).trim();
+    }
+
+    function makeHeaders(headerRow, maxColumns) {
+      const names = new Map();
+      return Array.from({ length: maxColumns }, (_, index) => {
+        const base = String(headerRow[index] ?? "").trim() || `ستون ${faNumber.format(index + 1)}`;
+        const count = (names.get(base) || 0) + 1;
+        names.set(base, count);
+        return {
+          key: `c${index}`,
+          index,
+          label: count === 1 ? base : `${base} (${faNumber.format(count)})`
+        };
+      });
+    }
+
+    function firstHeaderRow(rows) {
+      const limit = Math.min(rows.length, 10);
+      for (let i = 0; i < limit; i++) {
+        const filled = (rows[i] || []).filter(value => String(value ?? "").trim() !== "").length;
+        if (filled >= 2) return i;
+      }
+      return 0;
+    }
+
+    function storageKey() { return `excel-card-display:${state.fileKey}`; }
+
+    function loadChecks() {
+      try { state.checks = JSON.parse(localStorage.getItem(storageKey()) || "{}"); }
+      catch { state.checks = {}; }
+    }
+
+    function saveChecks() {
+      try { localStorage.setItem(storageKey(), JSON.stringify(state.checks)); }
+      catch { /* ذخیره‌سازی محلی ممکن است مسدود باشد. */ }
+    }
+
+    function rowKey(row) { return `${state.sheetName}::${row.sourceIndex}`; }
+    function isChecked(row) { return Boolean(state.checks[rowKey(row)]); }
+
+    function parseSheet() {
+      const sheet = state.workbook.Sheets[state.sheetName];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: null, blankrows: false });
+      const shownRows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "", blankrows: false });
+      const baseRows = shownRows.length ? shownRows : rawRows;
+
+      if (!baseRows.length) {
+        state.headers = [];
+        state.rows = [];
+        return;
+      }
+
+      const headerIndex = firstHeaderRow(baseRows);
+      const maxColumns = Math.max(1, ...rawRows.map(row => row.length), ...shownRows.map(row => row.length));
+      state.headers = makeHeaders(baseRows[headerIndex] || [], maxColumns);
+      state.rows = [];
+
+      const maxRows = Math.max(rawRows.length, shownRows.length);
+      for (let index = headerIndex + 1; index < maxRows; index++) {
+        const rawRow = rawRows[index] || [];
+        const shownRow = shownRows[index] || [];
+        const cells = state.headers.map(header => ({
+          raw: rawRow[header.index],
+          display: formatValue(rawRow[header.index], shownRow[header.index], header.label)
+        }));
+
+        if (cells.every(cell => !String(cell.display || "").trim())) continue;
+        state.rows.push({ sourceIndex: index + 1, cells });
+      }
+    }
+
+    function cell(row, key) {
+      if (key === "sourceIndex") return { raw: row.sourceIndex, display: String(row.sourceIndex) };
+      const header = state.headers.find(item => item.key === key);
+      return header ? row.cells[header.index] : { raw: "", display: "" };
+    }
+
+    function headerMatching(regex) {
+      return state.headers.find(header => regex.test(normalizeText(header.label)));
+    }
+
+    function fillSortOptions() {
+      const visibleHeaders = state.headers.filter(header => !isHiddenHeader(header.label));
+      const options = visibleHeaders
+        .map(header => `<option value="${header.key}">${escapeHTML(header.label)}</option>`)
+        .join("");
+      el.sortSelect.innerHTML = `<option value="sourceIndex">ردیف فایل</option>${options}`;
+
+      const preferred = visibleHeaders.find(header => /تاریخ|نام|عنوان|درخواست.?دهنده/.test(normalizeText(header.label)));
+      el.sortSelect.value = preferred ? preferred.key : "sourceIndex";
+    }
+
+    function applyFilters() {
+      const terms = el.searchInput.value
+        .split(/\r?\n/)
+        .map(normalizeText)
+        .filter(Boolean);
+      const status = el.statusFilter.value;
+      const sortKey = el.sortSelect.value;
+
+      let rows = state.rows.filter(row => {
+        const checked = isChecked(row);
+        if (status === "checked" && !checked) return false;
+        if (status === "unchecked" && checked) return false;
+        if (!terms.length) return true;
+
+        const allText = normalizeText(
+          row.cells
+            .filter((_, index) => !isHiddenHeader(state.headers[index]?.label))
+            .map(item => item.display)
+            .join(" | ")
+        );
+        return terms.some(term => allText.includes(term));
+      });
+
+      rows.sort((a, b) => {
+        const left = cell(a, sortKey);
+        const right = cell(b, sortKey);
+        if (typeof left.raw === "number" && typeof right.raw === "number") {
+          return (left.raw - right.raw) * state.direction;
+        }
+        return collator.compare(left.display, right.display) * state.direction;
+      });
+
+      state.visibleRows = rows;
+      renderCards();
+      updateMeta();
+    }
+
+    function isWideField(label, value) {
+      return /شرح|توضیح|جزئیات|آدرس|علت|ملاحظات|پیام|یادداشت/.test(normalizeText(label)) || String(value).length > 70;
+    }
+
+    function renderCards() {
+      if (!state.visibleRows.length) {
+        el.cards.innerHTML = `<div class="empty">موردی برای نمایش پیدا نشد.</div>`;
+        return;
+      }
+
+      const titleHeader = headerMatching(/نام.?درخواست.?دهنده|درخواست.?دهنده|عنوان|موضوع|نام|کالا|شرح/);
+      const typeHeader = headerMatching(/نوع.?درخواست|دسته|گروه|نوع/);
+      const statusHeader = headerMatching(/وضعیت/);
+      const rowHeader = headerMatching(/^ردیف$|شماره.?ردیف/);
+
+      el.cards.innerHTML = state.visibleRows.map(row => {
+        const checked = isChecked(row);
+        const title = titleHeader ? cell(row, titleHeader.key).display : row.cells.find(item => item.display)?.display;
+        const type = typeHeader ? cell(row, typeHeader.key).display : "";
+        const sourceRow = rowHeader ? cell(row, rowHeader.key).display : faNumber.format(row.sourceIndex - 1);
+        const status = statusHeader ? cell(row, statusHeader.key).display : "";
+
+        const omitted = new Set([
+          titleHeader?.index,
+          typeHeader?.index,
+          statusHeader?.index,
+          rowHeader?.index
+        ].filter(Number.isInteger));
+
+        let fields = state.headers.map((header, index) => {
+          const value = row.cells[index].display;
+          if (!value || omitted.has(index) || isHiddenHeader(header.label)) return "";
+          return `
+            <div class="data-item ${isWideField(header.label, value) ? "wide" : ""}">
+              <div class="data-label">${escapeHTML(header.label)}</div>
+              <div class="data-value">${escapeHTML(value)}</div>
+            </div>`;
+        }).join("");
+
+        if (!fields) {
+          fields = state.headers.map((header, index) => {
+            const value = row.cells[index].display;
+            if (!value || isHiddenHeader(header.label)) return "";
+            return `
+              <div class="data-item ${isWideField(header.label, value) ? "wide" : ""}">
+                <div class="data-label">${escapeHTML(header.label)}</div>
+                <div class="data-value">${escapeHTML(value)}</div>
+              </div>`;
+          }).join("");
+        }
+
+        return `
+          <article class="card ${checked ? "checked" : ""}" data-key="${escapeHTML(rowKey(row))}">
+            <div class="card-head">
+              <div>
+                <h2 class="card-title">${escapeHTML(title || `ردیف ${sourceRow}`)}</h2>
+                ${type ? `<div class="card-subtitle">${escapeHTML(type)}</div>` : ""}
+              </div>
+              <label class="check-label">
+                <input class="row-check" type="checkbox" ${checked ? "checked" : ""} aria-label="تغییر وضعیت ثبت">
+                <span>${checked ? "ثبت شد" : "ثبت نشده"}</span>
+              </label>
+            </div>
+            <div class="tags">
+              <span class="tag">ردیف ${escapeHTML(sourceRow)}</span>
+              ${status ? `<span class="tag">${escapeHTML(status)}</span>` : ""}
+              <span class="tag ${checked ? "state-on" : "state-off"}">${checked ? "انجام‌شده" : "در انتظار"}</span>
+            </div>
+            <div class="data-list">${fields}</div>
+          </article>`;
+      }).join("");
+    }
+
+    function updateMeta() {
+      const checkedCount = state.rows.reduce((total, row) => total + (isChecked(row) ? 1 : 0), 0);
+      el.visibleCount.textContent = `${faNumber.format(state.visibleRows.length)} مورد`;
+      el.sheetMeta.textContent = `${faNumber.format(state.rows.length)} ردیف · ${faNumber.format(state.headers.length)} ستون · ${faNumber.format(checkedCount)} ثبت‌شده`;
+    }
+
+    function loadSheet(name) {
+      state.sheetName = name;
+      parseSheet();
+      fillSortOptions();
+      el.searchInput.value = "";
+      el.statusFilter.value = "all";
+      state.direction = 1;
+      el.sortDirection.textContent = "↑";
+      applyFilters();
+    }
+
+    async function openFile(file) {
+      if (!file) return;
+      setMessage();
+
+      if (typeof XLSX === "undefined") {
+        setMessage("کتابخانه SheetJS بارگذاری نشد. اتصال اینترنت را بررسی کنید.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array", cellDates: false, cellText: true });
+        if (!workbook.SheetNames.length) throw new Error("شیتی در فایل پیدا نشد.");
+
+        state.workbook = workbook;
+        state.file = file;
+        state.fileKey = `${file.name}|${file.size}|${file.lastModified}`;
+        loadChecks();
+
+        el.fileName.textContent = file.name;
+        el.sheetSelect.innerHTML = workbook.SheetNames
+          .map(name => `<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`)
+          .join("");
+
+        el.upload.style.display = "none";
+        el.workspace.classList.add("ready");
+        loadSheet(workbook.SheetNames[0]);
+      } catch (error) {
+        console.error(error);
+        setMessage(`خواندن فایل ممکن نشد: ${error.message || "فایل نامعتبر است."}`);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function closeFile() {
+      state.workbook = null;
+      state.file = null;
+      state.rows = [];
+      state.visibleRows = [];
+      el.fileInput.value = "";
+      el.cards.innerHTML = "";
+      el.workspace.classList.remove("ready");
+      el.upload.style.display = "flex";
+      setMessage();
+    }
+
+    el.fileInput.addEventListener("change", event => openFile(event.target.files?.[0]));
+
+    ["dragenter", "dragover"].forEach(type => {
+      el.upload.addEventListener(type, event => {
+        event.preventDefault();
+        el.upload.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(type => {
+      el.upload.addEventListener(type, event => {
+        event.preventDefault();
+        el.upload.classList.remove("dragover");
+      });
+    });
+
+    el.upload.addEventListener("drop", event => openFile(event.dataTransfer?.files?.[0]));
+    el.sheetSelect.addEventListener("change", () => loadSheet(el.sheetSelect.value));
+    el.searchInput.addEventListener("input", applyFilters);
+    el.statusFilter.addEventListener("change", applyFilters);
+    el.sortSelect.addEventListener("change", applyFilters);
+
+    el.sortDirection.addEventListener("click", () => {
+      state.direction *= -1;
+      el.sortDirection.textContent = state.direction === 1 ? "↑" : "↓";
+      applyFilters();
+    });
+
+    el.resetFilters.addEventListener("click", () => {
+      el.searchInput.value = "";
+      el.statusFilter.value = "all";
+      el.sortSelect.value = "sourceIndex";
+      state.direction = 1;
+      el.sortDirection.textContent = "↑";
+      applyFilters();
+    });
+
+    el.cards.addEventListener("change", event => {
+      const checkbox = event.target.closest(".row-check");
+      if (!checkbox) return;
+
+      const card = checkbox.closest(".card");
+      const key = card.dataset.key;
+      if (checkbox.checked) state.checks[key] = true;
+      else delete state.checks[key];
+      saveChecks();
+      applyFilters();
+    });
+
+    el.closeFile.addEventListener("click", closeFile);
+  })();
+  </script>
+</body>
+</html>
